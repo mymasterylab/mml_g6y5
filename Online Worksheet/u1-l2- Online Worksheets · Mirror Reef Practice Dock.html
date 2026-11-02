@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mirror Reef Practice Dock · Session 2 online worksheets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#00A7B2; --teal2:#42bcb8; --teal3:#00928e; --tealSoft:#E3F6F7; --tealMist:#F3FBFB;
+  --orange:#FAA71C; --burnt:#D77F28; --crimson:#C92426; --emerald:#047857; --leaf:#66A34E;
+  --ink:#151515; --muted:#44585a; --bg:#FFFFFF;
+  color-scheme: light; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 90px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:18px;line-height:1.45}
+h1,h2,h3,.disp{font-family:"Fredoka","Nunito",system-ui,sans-serif;font-weight:600}
+button,input{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible{outline:4px solid var(--orange);outline-offset:2px}
+
+.hero{max-width:1000px;margin:0 auto;padding:18px 18px 4px;display:flex;gap:16px;align-items:center}
+.hero svg{flex:0 0 96px}
+.hero h1{margin:0;color:var(--teal3);font-size:clamp(28px,4.4vw,40px);line-height:1.1}
+.hero p{margin:4px 0 0;color:var(--muted)}
+
+.tabs{position:sticky;top:0;z-index:5;background:#fff;border-bottom:3px solid var(--tealSoft)}
+.tabs::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:#fff;z-index:10}
+.tabs .in{max-width:1000px;margin:0 auto;padding:10px 18px;display:flex;gap:8px;overflow-x:auto}
+.tab{flex:0 0 auto;border:3px solid var(--tealSoft);background:#fff;border-radius:18px;padding:8px 14px;font-weight:800;color:var(--muted);text-align:left}
+.tab small{display:block;font-weight:700;font-size:13px}
+.tab[aria-selected="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
+
+main{max-width:1000px;margin:0 auto;padding:16px 18px 40px}
+.intro{display:flex;gap:14px;align-items:flex-start;background:#FFF6E3;border:2px solid #FDE2AE;border-radius:22px;padding:12px 16px;margin-bottom:16px}
+.intro svg{flex:0 0 58px}
+.intro b.who{display:block;font-family:Fredoka,sans-serif;color:var(--burnt)}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 16px}
+.ctl{border:3px solid var(--tealSoft);background:#fff;border-radius:999px;padding:8px 16px;font-weight:800;color:var(--teal3)}
+.ctl.main{background:var(--orange);border-color:var(--orange);color:#3b2200}
+.score{margin-left:auto;font-weight:800;color:var(--muted)}
+.prog{height:12px;border-radius:999px;background:var(--tealSoft);overflow:hidden;margin:0 0 18px}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--leaf));transition:width .4s}
+
+ol.qs{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.card{border:3px solid var(--tealSoft);border-radius:22px;padding:14px 16px 16px;background:#fff;display:grid;grid-template-columns:44px 1fr;gap:12px}
+.card.ok{border-color:#bfe0b2;background:#F7FBF5}
+.card.no{border-color:#FDE2AE}
+.num{width:40px;height:40px;border-radius:14px;background:var(--teal);color:#fff;display:grid;place-items:center;font-family:Fredoka,sans-serif;font-size:20px}
+.card.ok .num{background:var(--leaf)}
+.qt{font-weight:800;font-size:19px;margin:6px 0 10px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ans{width:150px;border:3px solid var(--tealSoft);border-radius:14px;padding:8px 12px;font-size:20px;font-weight:800}
+.pm{border:3px solid var(--tealSoft);background:var(--tealMist);border-radius:14px;padding:8px 12px;font-weight:800}
+.chk{border:0;border-radius:14px;background:var(--teal);color:#fff;font-weight:800;padding:10px 16px}
+.hintb{border:0;background:none;color:var(--burnt);font-weight:800;text-decoration:underline;padding:6px}
+.opts{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.opt{border:3px solid var(--tealSoft);background:#fff;border-radius:16px;padding:10px 12px;font-weight:800;text-align:left}
+.opt:hover{background:var(--tealMist)}
+.opt.right{background:#E8F4E3;border-color:var(--leaf)}
+.opt.wrong{background:#FDEEEE;border-color:var(--crimson)}
+.fb{margin-top:8px;font-weight:700}
+.fb.good{color:var(--emerald)} .fb.oops{color:#8a4b0f}
+.hint{margin-top:6px;color:var(--muted);display:none}
+.hint.show{display:block}
+.pic{margin:4px 0 8px}
+.pic svg{width:190px;height:auto;border:2px solid var(--tealSoft);border-radius:14px;background:#fff}
+.done{margin-top:20px;text-align:center;border:3px solid var(--orange);border-radius:22px;padding:16px;background:#FFF6E3;display:none}
+.done.show{display:block}
+.done h2{margin:0;color:var(--burnt)}
+@media (max-width:560px){.card{grid-template-columns:1fr}.num{width:36px;height:36px}}
+@media (prefers-reduced-motion:reduce){.prog i{transition:none}}
+
+.name{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--muted)}
+.name input{border:3px solid var(--tealSoft);border-radius:999px;padding:7px 14px;font-weight:800;width:190px}
+.reportBox{display:none;margin:0 0 18px;border:3px solid var(--teal);border-radius:22px;padding:14px 16px;background:var(--tealMist)}
+.reportBox.show{display:block}
+.reportBox h3{margin:0 0 6px;color:var(--teal3);font-size:20px}
+.reportBox p{margin:0 0 8px;color:var(--muted);font-size:16px}
+.reportBox textarea{width:100%;min-height:280px;border:2px solid var(--tealSoft);border-radius:14px;padding:12px;font:600 15px/1.45 "Nunito",system-ui,sans-serif;color:var(--ink);background:#fff;resize:vertical}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(30px);opacity:0;
+  background:var(--emerald);color:#fff;font-weight:800;padding:12px 20px;border-radius:999px;transition:all .3s;z-index:30;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.setSec[hidden]{display:none}
+.kind{display:inline-block;font-size:13px;font-weight:800;border-radius:999px;padding:2px 10px;margin-top:4px;background:var(--tealMist);color:var(--teal3);border:2px solid var(--tealSoft)}
+.k-multi{background:#FFF6E3;color:#8a4b0f;border-color:#FDE2AE}
+.k-match{background:#EEF6EA;color:var(--emerald);border-color:#cfe6c6}
+.k-drag{background:#FDEEEE;color:var(--crimson);border-color:#F5C9C9}
+.blank{display:inline-block;min-width:54px;border-bottom:3px solid var(--orange);color:transparent}
+.how{margin:0 0 8px;color:var(--muted);font-size:15px;font-weight:700}
+.opt.tick{display:flex;align-items:center;gap:10px}
+.opt.tick .box{flex:0 0 22px;width:22px;height:22px;border-radius:7px;border:3px solid var(--teal2);background:#fff}
+.opt.tick[aria-pressed="true"]{background:var(--tealMist);border-color:var(--teal)}
+.opt.tick[aria-pressed="true"] .box{background:var(--teal);box-shadow:inset 0 0 0 3px #fff}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:8px}
+.match .col{display:flex;flex-direction:column;gap:8px}
+.mi{position:relative;border:3px solid var(--tealSoft);background:#fff;border-radius:16px;padding:10px 40px 10px 12px;font-weight:800;text-align:left;min-height:48px}
+.mi.L{background:var(--tealMist)}
+.mi.sel{border-color:var(--orange)!important;box-shadow:0 0 0 3px #FDE2AE}
+.mi .tagn{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;color:#fff;font-size:13px;display:grid;place-items:center}
+.mi .tagn:empty{display:none}
+.pool{display:flex;flex-wrap:wrap;gap:8px;min-height:56px;padding:10px;border:3px dashed var(--tealSoft);border-radius:16px;margin-bottom:10px}
+.bins{display:grid;gap:10px;margin-bottom:8px}
+.bin{border:3px solid var(--tealSoft);border-radius:16px;padding:8px;min-height:110px;background:var(--tealMist)}
+.bin > b{display:block;font-family:Fredoka,sans-serif;font-weight:700;font-size:22px;text-align:center;margin-bottom:6px;color:var(--teal3)}
+.bin .drop{display:flex;flex-direction:column;gap:6px}
+.pool.ready,.bin.ready{border-color:var(--orange)}
+.pool.over,.bin.over{background:#FFF6E3}
+.dc{border:2px solid var(--teal2);background:#fff;border-radius:12px;padding:8px 10px;font-weight:800;font-size:15px;text-align:left;cursor:grab}
+.dc.picked{outline:3px solid var(--orange);background:#FFF6E3}
+.dc.bad{border-color:var(--crimson);background:var(--crimsonSoft,#FDEEEE)}
+.dc.good{border-color:var(--leaf);background:#E8F4E3}
+.clr{border:3px solid var(--tealSoft);background:#fff;border-radius:14px;padding:8px 14px;font-weight:800;color:var(--muted)}
+@media (max-width:560px){.match{gap:8px}.bins{grid-template-columns:1fr!important}}
+
+</style>
+</head>
+<body>
+<header class="hero">
+  <svg viewBox="0 0 96 70" aria-hidden="true"><ellipse cx="48" cy="40" rx="42" ry="22" fill="#00A7B2"/><rect x="36" y="8" width="22" height="16" rx="6" fill="#00928e"/><circle cx="60" cy="40" r="12" fill="#fff" stroke="#FAA71C" stroke-width="4"/><circle cx="63" cy="40" r="5" fill="#151515"/><circle cx="30" cy="40" r="5" fill="#fff"/><circle cx="16" cy="40" r="4" fill="#fff"/></svg>
+  <div><h1>Mirror Reef Practice Dock</h1><p>Four practice sets with 15 fresh questions each time: fill in, choose one, choose all, match and drag and drop.</p></div>
+</header>
+<nav class="tabs" aria-label="Practice sets"><div class="in" role="tablist" id="tabs"></div></nav>
+<main>
+  <div class="intro" id="intro"></div>
+  <div class="bar">
+    <label class="name">Your name <input id="stuName" type="text" autocomplete="off" placeholder="Type your name"></label>
+    <button class="ctl main" id="newQ">🔄 New questions</button>
+    <button class="ctl" id="copyBtn">📋 Copy report for my teacher</button>
+    <span class="score" id="score" aria-live="polite"></span>
+  </div>
+  <section class="reportBox" id="reportBox" aria-live="polite">
+    <h3>Your report for this set</h3>
+    <p id="reportMsg">Copied! Paste it into the chat with your teacher.</p>
+    <textarea id="reportText" readonly aria-label="Performance report text"></textarea>
+  </section>
+  <div class="prog" aria-hidden="true"><i id="progBar"></i></div>
+  <div id="host"></div>
+</main>
+<div class="toast" id="toast" role="status">Report copied ✓</div>
+
+<script>
+(function(){
+"use strict";
+const M="\u2212";
+const fmt=n=>{const s=Math.abs(n).toLocaleString("en-US");return n>0?"+"+s:(n<0?M+s:"0");};
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const pick=(a,n)=>shuffle(a).slice(0,n);
+const one=a=>a[Math.floor(Math.random()*a.length)];
+const $=id=>document.getElementById(id);
+const ECHO=`<svg viewBox="0 0 58 58" aria-hidden="true"><circle cx="29" cy="29" r="28" fill="#fff"/><ellipse cx="29" cy="33" rx="24" ry="14" fill="#00A7B2"/><rect x="23" y="12" width="12" height="10" rx="4" fill="#00928e"/><circle cx="36" cy="33" r="7" fill="#fff" stroke="#FAA71C" stroke-width="3"/><circle cx="38" cy="33" r="3" fill="#151515"/></svg>`;
+
+/* ===== question makers =====
+   kinds: type (fill), mc (one answer), multi (select all), match (pair columns), drag (sort into bins) */
+const T=(text,answer,hint,why,pic,tag)=>({kind:"type",text,answer,hint,why,pic,tag});
+const C=(text,right,wrongs,hint,why,pic,tag)=>({kind:"mc",text,options:shuffle([right].concat(wrongs)),answer:right,hint,why,pic,tag});
+const MU=(text,rights,wrongs,hint,why,pic,tag)=>({kind:"multi",text,options:shuffle(rights.concat(wrongs)),answers:rights,hint,why,pic,tag});
+const MA=(text,pairs,hint,why,pic,tag)=>({kind:"match",text,left:pairs.map(p=>p[0]),right:pairs.map(p=>p[1]),hint,why,pic,tag});
+const DR=(text,bins,items,hint,why,pic,tag)=>({kind:"drag",text,bins,items:shuffle(items),hint,why,pic,tag});
+const KIND_NAME={type:"Fill in the blank",mc:"Multiple choice (one answer)",multi:"Multiple choice (more than one answer)",match:"Match the columns",drag:"Drag and drop"};
+
+function lineSVG(vals,labelEvery,marks){
+  const n=vals.length, top=24, bot=286, gap=(bot-top)/(n-1), x=86;
+  let s=`<svg viewBox="0 0 190 310" role="img" aria-label="Vertical number line">`;
+  const zi=vals.indexOf(0), zy=top+zi*gap;
+  s+=`<rect x="0" y="0" width="190" height="${zy}" fill="#F3FBFB"/><rect x="0" y="${zy}" width="190" height="${310-zy}" fill="#CFEFF0"/>`;
+  s+=`<line x1="${x}" y1="${top-12}" x2="${x}" y2="${bot+12}" stroke="#151515" stroke-width="3"/>`;
+  s+=`<path d="M${x} ${top-20} l-7 12 h14z M${x} ${bot+20} l-7 -12 h14z" fill="#151515"/>`;
+  vals.forEach((v,i)=>{const y=top+i*gap;
+    s+=`<line x1="${x-10}" y1="${y}" x2="${x+10}" y2="${y}" stroke="#151515" stroke-width="2"/>`;
+    if(v===0||i%labelEvery===zi%labelEvery) s+=`<text x="${x-16}" y="${y+6}" text-anchor="end" font-family="Fredoka,Nunito,sans-serif" font-size="16" font-weight="600" fill="${v>0?'#00928e':v<0?'#C92426':'#151515'}">${fmt(v)}</text>`;});
+  marks.forEach(([i,label])=>{const y=top+i*gap;
+    s+=`<circle cx="${x}" cy="${y}" r="8" fill="#FAA71C" stroke="#151515" stroke-width="2"/>`;
+    s+=`<text x="${x+20}" y="${y+6}" font-family="Fredoka,Nunito,sans-serif" font-size="17" font-weight="700" fill="#151515">${label}</text>`;});
+  return s+"</svg>";
+}
+function makeLine(){ const step=one([1,1,2,2,5,10]), half=one([4,5]); const vals=[]; for(let k=half;k>=-half;k--) vals.push(k*step); return {vals,step,labelEvery:Math.random()<.45?2:1}; }
+/* ---------- extra picture helpers ---------- */
+const lab=v=>{ if(typeof v==="string") return v; const r=Math.round(v*1000)/1000; return r>0?"+"+r:(r<0?M+Math.abs(r):"0"); };
+function hlineSVG(lo,hi,step,marks,opts={}){
+  const n=Math.round((hi-lo)/step), W=420, pad=26, y=56, X=v=>pad+(v-lo)/(hi-lo)*(W-2*pad), every=opts.every||1;
+  let s=`<svg viewBox="0 0 ${W} 100" role="img" aria-label="Number line" style="width:100%;max-width:420px">`;
+  s+=`<line x1="${pad-12}" y1="${y}" x2="${W-pad+12}" y2="${y}" stroke="#151515" stroke-width="2.5"/><path d="M${pad-18} ${y} l12 -7 v14z M${W-pad+18} ${y} l-12 -7 v14z" fill="#151515"/>`;
+  for(let k=0;k<=n;k++){ const v=+(lo+k*step).toFixed(6), x=X(v);
+    const labels=opts.labels; let t=null;
+    if(labels){ const f=labels.find(l=>Math.abs(l[0]-v)<1e-6); if(f) t=f[1]; }
+    else if(k%every===0||v===0) t=lab(v);
+    const big=t!==null; s+=`<line x1="${x}" y1="${y-(big?11:6)}" x2="${x}" y2="${y+(big?11:6)}" stroke="#151515" stroke-width="${v===0?3:big?2.4:1.4}"/>`;
+    if(t!==null) s+=`<text x="${x}" y="${y+27}" text-anchor="middle" font-family="Fredoka,Nunito,sans-serif" font-size="15" font-weight="600" fill="${v>0?'#00928e':v<0?'#C92426':'#151515'}">${t}</text>`; }
+  (marks||[]).forEach(([v,l,c])=>{ const x=X(v); s+=`<circle cx="${x}" cy="${y}" r="8" fill="${c||'#FAA71C'}" stroke="#151515" stroke-width="2"/>`; if(l) s+=`<text x="${x}" y="${y-15}" text-anchor="middle" font-family="Fredoka,Nunito,sans-serif" font-size="16" font-weight="700">${l}</text>`; });
+  return s+"</svg>";
+}
+function planeSVG(r,points,segs){
+  const W=300,pad=22,c=W/2,u=(W-2*pad)/(2*r),P=(x,y)=>[c+x*u,c-y*u];
+  let s=`<svg viewBox="0 0 ${W} ${W}" role="img" aria-label="Coordinate plane" style="width:100%;max-width:300px">`;
+  s+=`<rect x="${pad}" y="${pad}" width="${c-pad}" height="${c-pad}" fill="#F3FBFB"/><rect x="${c}" y="${pad}" width="${c-pad}" height="${c-pad}" fill="#FFF6E3"/><rect x="${pad}" y="${c}" width="${c-pad}" height="${c-pad}" fill="#EEF6EA"/><rect x="${c}" y="${c}" width="${c-pad}" height="${c-pad}" fill="#FDEEEE"/>`;
+  for(let k=-r;k<=r;k++){ const [x]=P(k,0),[,y]=P(0,k); s+=`<line x1="${x}" y1="${pad}" x2="${x}" y2="${W-pad}" stroke="#d3eaec"/><line x1="${pad}" y1="${y}" x2="${W-pad}" y2="${y}" stroke="#d3eaec"/>`;
+    if(k&&k%2===0) s+=`<text x="${x}" y="${c+14}" text-anchor="middle" font-family="Nunito" font-size="10" font-weight="700" fill="#44585a">${k<0?M+(-k):k}</text><text x="${c-5}" y="${y+4}" text-anchor="end" font-family="Nunito" font-size="10" font-weight="700" fill="#44585a">${k<0?M+(-k):k}</text>`; }
+  s+=`<line x1="${pad-8}" y1="${c}" x2="${W-pad+8}" y2="${c}" stroke="#151515" stroke-width="2"/><line x1="${c}" y1="${pad-8}" x2="${c}" y2="${W-pad+8}" stroke="#151515" stroke-width="2"/>`;
+  (segs||[]).forEach(([a,b,col])=>{ const p=P(a[0],a[1]),q=P(b[0],b[1]); s+=`<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="${col||'#D77F28'}" stroke-width="3" stroke-dasharray="6 4"/>`; });
+  (points||[]).forEach(([x,y,l,col])=>{ const [px,py]=P(x,y); s+=`<circle cx="${px}" cy="${py}" r="6" fill="${col||'#FAA71C'}" stroke="#151515" stroke-width="1.8"/>`; if(l) s+=`<text x="${px+8}" y="${py-7}" font-family="Fredoka,Nunito" font-size="14" font-weight="700">${l}</text>`; });
+  return s+"</svg>";
+}
+const fracStr=(n,d)=>{ const neg=n<0; n=Math.abs(n); const w=Math.floor(n/d), r=n%d; let t=r===0?String(w):(w?`${w} ${r}/${d}`:`${r}/${d}`); return (neg?M:"")+t; };
+const DOCK_NAME="Mirror Reef Practice Dock", SESSION_LINE="Session 2: Opposites and the number line";
+const opp=n=>n===0?0:-n;
+const Sg=n=>fmt(n);               // +5, −5, 0
+const big=()=>one([R(2,12),R(13,60),R(100,999)]);
+const OPP_TAG="Finding the opposite", LINE_TAG="Opposites on a number line", FLIP_TAG="Flip twice: −(−a)", LIFE_TAG="Opposites in real life", ZERO_TAG="0 is its own opposite";
+
+/* ---------- SET A: find the opposite ---------- */
+function setA(){
+  const qs=[];
+  for(let k=0;k<4;k++){ const n=(k%2?1:-1)*big(); qs.push(T(`The opposite of <b>${Sg(n)}</b> is ____`,opp(n),"Same distance from 0, other side of 0.",`The opposite of ${Sg(n)} is ${Sg(opp(n))}.`,null,OPP_TAG)); }
+  qs.push(T(`The opposite of <b>0</b> is ____`,0,"Which number sits exactly in the middle?","0 is its own opposite.",null,ZERO_TAG));
+  { const d=(Math.random()<.5?-1:1)*(R(1,9)+0.5); qs.push(T(`The opposite of <b>${lab(d)}</b> is ____`,-d,"Decimals have opposites too.",`It is ${lab(-d)}.`,null,"Decimals and fractions")); }
+  { const n=R(2,9); qs.push(T(`The opposite of <b>${M}1/${n}</b> is ____ (you can type a fraction like 1/${n})`,1/n,"Fractions have opposites too.",`It is 1/${n}.`,null,"Decimals and fractions")); qs[qs.length-1].show=`1/${n}`; }
+  for(let k=0;k<2;k++){ const n=(k?1:-1)*R(3,40); qs.push(C(`Which number is the opposite of <b>${Sg(n)}</b>?`,Sg(opp(n)),[Sg(n),"0",Sg(opp(n)*2)],"Flip it across 0.",`The opposite of ${Sg(n)} is ${Sg(opp(n))}.`,null,OPP_TAG)); }
+  { const a=R(2,20),b=R(2,20),c=R(2,20);
+    qs.push(MU("Tick ALL the pairs that are opposites.",[`${Sg(a)} and ${Sg(-a)}`,`${Sg(-b)} and ${Sg(b)}`,"0 and 0"],[`${Sg(c)} and ${Sg(c)}`,`${Sg(-a)} and ${Sg(-a-1)}`],"Opposites have the same number but different signs. 0 pairs with itself.","These pairs are mirror twins.",null,OPP_TAG)); }
+  { qs.push(MU("Tick ALL the numbers whose opposite is <b>negative</b>.",[Sg(R(2,9)),Sg(R(10,30)),"+0.5"],[Sg(-R(2,9)),"0",Sg(-R(10,30))],"A positive number flips to a negative one.","Positive numbers have negative opposites.",null,OPP_TAG)); }
+  for(let k=0;k<2;k++){ const v=shuffle([R(2,9),-R(2,9),R(10,25),-R(10,25)]);
+    const pairs=v.slice(0,3).map(n=>[Sg(n),Sg(opp(n))]).concat([["0","0"]]);
+    qs.push(MA("Match each number to its opposite.",shuffle(pairs),"Same number, other sign.","Every number has one opposite.",null,OPP_TAG)); }
+  for(let k=0;k<2;k++){ const items=[R(2,9),R(10,40)].map(n=>({label:Sg(n),bin:"Opposite is negative"})).concat([-R(2,9),-R(10,40)].map(n=>({label:Sg(n),bin:"Opposite is positive"})),[{label:"0",bin:"Opposite is 0"}]);
+    qs.push(DR("Drag each number to show what its opposite is.",["Opposite is positive","Opposite is 0","Opposite is negative"],items,"Negative numbers flip to positive. Positive numbers flip to negative.","All sorted!",null,OPP_TAG)); }
+  return shuffle(qs);
+}
+
+/* ---------- SET B: opposites on the number line ---------- */
+function setB(){
+  const qs=[];
+  for(let k=0;k<5;k++){ const lo=-8,hi=8; const n=(Math.random()<.5?-1:1)*R(1,8);
+    qs.push(T(`Point P is shown. Its opposite is ____`,opp(n),"Count the steps from 0 to P, then go the same number of steps the other way.",`P is ${Sg(n)}, so its opposite is ${Sg(opp(n))}.`,hlineSVG(lo,hi,1,[[n,"P"]],{every:2}),LINE_TAG)); }
+  { const n=R(2,6); qs.push(T(`Point Q is ${n} steps <b>below</b> 0 on this line. Its opposite is ____`,n,"Above is positive.",`Q is ${Sg(-n)}; its opposite is ${Sg(n)}.`,lineSVG([6,5,4,3,2,1,0,-1,-2,-3,-4,-5,-6],1,[[6+n,"Q"]]),LINE_TAG)); }
+  for(let k=0;k<3;k++){ const n=R(2,7); const pts=shuffle([n,-n,n-1>0?-(n-1):n+1,0]); const letters=["A","B","C","D"];
+    const right=letters.filter((l,i)=>pts[i]===n||pts[i]===-n).join(" and ");
+    const opts=[right]; while(opts.length<4){ const a=pick(letters,2).sort().join(" and "); if(!opts.includes(a)) opts.push(a); }
+    qs.push(C("Which two letters are <b>opposites</b>?",right,opts.slice(1),"Opposites are the same distance from 0 on opposite sides.",`${right} are both ${n} from 0.`,hlineSVG(-8,8,1,pts.map((p,i)=>[p,letters[i]]),{every:2}),LINE_TAG)); }
+  { const vals=shuffle([R(1,7),-R(1,7),R(1,7),-R(1,7),0]); const letters=["A","B","C","D","E"];
+    qs.push(MU("Tick ALL the letters whose opposite is to the <b>right</b> of 0.",letters.filter((l,i)=>vals[i]<0),letters.filter((l,i)=>vals[i]>=0),"If a point is left of 0, its opposite is right of 0.","Points left of 0 flip to the right.",hlineSVG(-8,8,1,vals.map((v,i)=>[v,letters[i]]),{every:2}),LINE_TAG)); }
+  { const vals=[R(2,7),-R(2,7)]; const letters=["A","B","C","D"]; const all=[vals[0],vals[1],0,-vals[0]];
+    qs.push(MU("Tick ALL the true sentences about this line.",[`A and D are opposites.`,`C is its own opposite.`],[`A and B are opposites.`,`B and D are opposites.`],"Check the distance from 0 for each pair.","Opposites are mirror images across 0.",hlineSVG(-8,8,1,all.map((v,i)=>[v,letters[i]]),{every:2}),LINE_TAG)); }
+  for(let k=0;k<2;k++){ const v=shuffle([R(1,4),R(5,8)].map(x=>Math.random()<.5?x:-x)); const pts=[v[0],opp(v[0]),v[1],opp(v[1])];
+    qs.push(MA("Match each letter to its number.",[["Letter A",Sg(pts[0])],["Letter B",Sg(pts[1])],["Letter C",Sg(pts[2])],["Letter D",Sg(pts[3])]],"A and B are opposites. So are C and D.","Mirror twins found!",hlineSVG(-8,8,1,pts.map((p,i)=>[p,"ABCD"[i]]),{every:2}),LINE_TAG)); }
+  { const items=[{label:Sg(-R(2,8)),bin:"Opposite is right of 0"},{label:Sg(-R(9,20)),bin:"Opposite is right of 0"},{label:Sg(R(2,8)),bin:"Opposite is left of 0"},{label:"+3.5",bin:"Opposite is left of 0"},{label:"0",bin:"Opposite is at 0"}];
+    for(let k=0;k<2;k++) qs.push(DR("Drag each number to where its opposite sits on a number line.",["Opposite is left of 0","Opposite is at 0","Opposite is right of 0"],items,"Negative numbers are left of 0, so their opposites are right of 0.","All sorted!",null,LINE_TAG)); }
+  return shuffle(qs);
+}
+
+/* ---------- SET C: flip twice ---------- */
+function setC(){
+  const qs=[];
+  for(let k=0;k<3;k++){ const n=R(2,30); qs.push(T(`${M}(${M}${n}) = ____`,n,"The opposite of a negative number is positive.",`${M}(${M}${n}) = ${n}.`,null,FLIP_TAG)); }
+  { const n=R(2,30); qs.push(T(`${M}(${n}) = ____`,-n,"One flip of a positive number.",`${M}(${n}) = ${M}${n}.`,null,FLIP_TAG)); }
+  { const n=R(2,15); qs.push(T(`${M}(${M}(${M}${n})) = ____`,-n,"Count the minus signs. Each one is a flip.",`Three flips land on ${M}${n}.`,null,FLIP_TAG)); }
+  qs.push(T(`${M}(0) = ____`,0,"What is the opposite of 0?","0 is its own opposite.",null,ZERO_TAG));
+  { const n=R(2,20); qs.push(T(`The opposite of the opposite of ${M}${n} is ____`,-n,"Flip twice and you are back where you started.",`It is ${M}${n}.`,null,FLIP_TAG)); }
+  for(let k=0;k<2;k++){ const n=R(2,20); const neg=k===1;
+    qs.push(C(neg?`What is ${M}(${n})?`:`What is ${M}(${M}${n})?`,neg?`${M}${n}`:`${n}`,neg?[`${n}`,"0",`${M}${M}${n}`]:[`${M}${n}`,"0",`${M}${n*2}`],"Each minus sign in front means “the opposite of”.",`The answer is ${neg?M+n:n}.`,null,FLIP_TAG)); }
+  { const n=R(2,12); qs.push(MU(`Tick ALL the ones equal to <b>${n}</b>.`,[`${M}(${M}${n})`,`${n}`,`the opposite of ${M}${n}`],[`${M}(${n})`,`${M}${n}`,`${M}(${M}(${M}${n}))`],"Count the flips.","These all equal "+n+".",null,FLIP_TAG)); }
+  { const n=R(2,12); qs.push(MU(`Tick ALL the ones equal to <b>${M}${n}</b>.`,[`${M}(${n})`,`${M}(${M}(${M}${n}))`,`the opposite of ${n}`],[`${M}(${M}${n})`,`${n}`,`the opposite of ${M}${n}`],"An odd number of flips lands on the negative side.","These all equal "+M+n+".",null,FLIP_TAG)); }
+  for(let k=0;k<2;k++){ const a=R(2,9),b=R(10,20),c=R(2,9);
+    qs.push(MA("Match each code to its value.",shuffle([[`${M}(${M}${a})`,`${a}`],[`${M}(${b})`,`${M}${b}`],[`${M}(0)`,"0"],[`${M}(${M}(${M}${c}))`,`${M}${c}`]]),"Each minus sign is one flip.","All matched!",null,FLIP_TAG)); }
+  { const a=R(2,9),b=R(2,9),c=R(2,9),d=R(2,9);
+    for(let k=0;k<2;k++) qs.push(DR("Drag each code into the right box.",["Positive","Zero","Negative"],[{label:`${M}(${M}${a})`,bin:"Positive"},{label:`${M}(${b})`,bin:"Negative"},{label:`${M}(0)`,bin:"Zero"},{label:`${M}(${M}(${M}${c}))`,bin:"Negative"},{label:`${M}(${M}(${M}(${M}${d})))`,bin:"Positive"}],"An even number of flips of a negative lands on positive.","All sorted!",null,FLIP_TAG)); }
+  return shuffle(qs);
+}
+
+/* ---------- SET D: opposites in real life ---------- */
+const LIFE=[
+ n=>[`${n} m above sea level`,`${n} m below sea level`,n],
+ n=>[`earning $${n}`,`spending $${n}`,n],
+ n=>[`${n} steps forward`,`${n} steps backward`,n],
+ n=>[`a rise of ${n} °C`,`a drop of ${n} °C`,n],
+ n=>[`gaining ${n} points`,`losing ${n} points`,n],
+ n=>[`${n} floors up`,`${n} floors down`,n],
+ n=>[`depositing $${n}`,`withdrawing $${n}`,n]
+];
+function setD(){
+  const qs=[];
+  pick(LIFE,4).forEach((f,k)=>{ const [a,b,n]=f(R(2,40)); const fromNeg=k%2===1;
+    qs.push(T(fromNeg?`If ${a} is +${n}, then ${b} is ____`:`If ${b} is ${M}${n}, then ${a} is ____`,fromNeg?-n:n,"Same amount, opposite direction.",`It is ${fromNeg?M+n:"+"+n}.`,null,LIFE_TAG)); });
+  qs.push(T("The opposite of “no change” is a change of ____",0,"No change has no direction.","The opposite of 0 is 0.",null,ZERO_TAG));
+  pick(LIFE,4).forEach(f=>{ const [a,b,n]=f(R(2,40)); qs.push(C(`What is the opposite of <b>${a}</b>?`,b,[a,`${f(n*2)[1]}`,"no change"],"Keep the amount. Change the direction.",`The opposite is ${b}.`,null,LIFE_TAG)); });
+  { const n=R(3,15); qs.push(MU(`Tick ALL the situations that could be shown by <b>${M}${n}</b>.`,[`${n} m below sea level`,`spending $${n}`,`a drop of ${n} °C`],[`${n} m above sea level`,`earning $${n}`,"no change"],"Minus means down, less or take away.","These are all "+M+n+".",null,LIFE_TAG)); }
+  { const n=R(3,15); qs.push(MU(`Tick ALL the pairs of opposite situations.`,[`${n} floors up / ${n} floors down`,`earning $${n} / spending $${n}`],[`${n} floors up / ${n+2} floors down`,`gaining ${n} points / gaining ${n} points`],"Opposites have the same amount and opposite directions.","These are true opposite pairs.",null,LIFE_TAG)); }
+  for(let k=0;k<2;k++){ const fs=pick(LIFE,4); qs.push(MA("Match each situation to its opposite.",fs.map(f=>{const [a,b]=f(R(2,30)); return Math.random()<.5?[a,b]:[b,a];}),"Same amount, opposite direction.","All matched!",null,LIFE_TAG)); }
+  for(let k=0;k<2;k++){ const fs=pick(LIFE,4); const items=fs.flatMap(f=>{const [a,b]=f(R(2,30)); return [{label:a,bin:"Plus (+)"},{label:b,bin:"Minus ("+M+")"}];}).slice(0,6);
+    qs.push(DR("Drag each situation into Plus or Minus.",["Plus (+)","Minus ("+M+")"],items,"Up, more or forward is plus. Down, less or backward is minus.","All sorted!",null,LIFE_TAG)); }
+  return shuffle(qs);
+}
+const SETS=[
+ {id:"A",name:"Find the opposite",make:setA,intro:"Every number has a mirror twin on the other side of 0. Find the opposites! Tip: press ± to add a minus sign."},
+ {id:"B",name:"Opposites on a line",make:setB,intro:"Read the number lines. Opposites are the same distance from 0, on opposite sides."},
+ {id:"C",name:"Flip twice",make:setC,intro:"The minus sign means “the opposite of”. Count the flips! An even number of flips lands you back where you started."},
+ {id:"D",name:"Opposites in real life",make:setD,intro:"Up and down, earn and spend, rise and fall. Keep the amount, flip the direction!"}
+];
+/* ===== sets & rendering ===== */
+let cur=0;
+const DATA=[], SEC=[];
+const tabs=$("tabs"), host=$("host");
+SETS.forEach((s,i)=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.id="tab"+i;
+  b.innerHTML=`Set ${s.id}<small>${s.name}</small>`;b.onclick=()=>open(i);tabs.appendChild(b);
+  const sec=document.createElement("section");sec.className="setSec";sec.hidden=true;
+  sec.innerHTML=`<ol class="qs"></ol><div class="done"></div>`;host.appendChild(sec);SEC.push(sec);DATA.push(null);});
+
+function norm(v){ v=String(v).trim().replace(/[\u2212\u2013\u2014]/g,"-").replace(/[$,°a-zA-Z]/g,"").trim();
+  let m=v.match(/^([+-]?)\s*(\d+)\s+(\d+)\s*\/\s*(\d+)$/); if(m) return (m[1]==="-"?-1:1)*(+m[2]+(+m[3])/(+m[4]));
+  m=v.match(/^([+-]?)\s*(\d+)\s*\/\s*(\d+)$/); if(m) return (m[1]==="-"?-1:1)*(+m[2])/(+m[3]);
+  v=v.replace(/\s/g,""); if(!/^[+-]?\d*\.?\d+$/.test(v)) return NaN; return parseFloat(v); }
+const plain=h=>{const d=document.createElement("div");d.innerHTML=h;return d.textContent.replace(/\s+/g," ").trim();};
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const BADGE={type:"✏️ Fill in",mc:"🔘 Choose one",multi:"☑️ Choose all that fit",match:"🔗 Match",drag:"🖐️ Drag and drop"};
+
+function open(i){ cur=i; [...tabs.children].forEach((b,k)=>b.setAttribute("aria-selected",k===i));
+  SEC.forEach((s,k)=>s.hidden=k!==i);
+  $("intro").innerHTML=ECHO+`<div><b class="who">Echo says</b>${SETS[i].intro}</div>`;
+  $("reportBox").classList.remove("show");
+  if(location.hash!=="#set-"+SETS[i].id.toLowerCase()) history.replaceState(null,"","#set-"+SETS[i].id.toLowerCase());
+  if(!DATA[i]) build(i); else update(); }
+
+function questionText(q){ return q.text.replace("____",'<span class="blank">____</span>'); }
+
+function build(i){
+  const sec=SEC[i], st={started:Date.now(),finished:null,items:SETS[i].make().map(q=>({q,done:false,first:null,wrong:[]}))};
+  DATA[i]=st;
+  const ol=sec.querySelector("ol"); ol.innerHTML=""; sec.querySelector(".done").className="done";
+  st.items.forEach((it,k)=>{ const q=it.q; const li=document.createElement("li"); li.className="card"; li.dataset.kind=q.kind;
+    let body=`<div class="num">${k+1}</div><div><span class="kind k-${q.kind}">${BADGE[q.kind]}</span><p class="qt">${questionText(q)}</p>${q.pic?`<div class="pic">${q.pic}</div>`:""}`;
+    if(q.kind==="type") body+=`<div class="row"><button class="pm" type="button" aria-label="Add or remove a minus sign">±</button><input class="ans" type="text" inputmode="decimal" autocomplete="off" aria-label="Your answer for question ${k+1}"><button class="chk" type="button">Check</button><button class="hintb" type="button">Hint</button></div>`;
+    else if(q.kind==="mc") body+=`<div class="opts">${q.options.map(o=>`<button class="opt" type="button">${o}</button>`).join("")}</div><button class="hintb" type="button">Hint</button>`;
+    else if(q.kind==="multi") body+=`<div class="opts">${q.options.map(o=>`<button class="opt tick" type="button" aria-pressed="false"><span class="box" aria-hidden="true"></span>${o}</button>`).join("")}</div><div class="row"><button class="chk" type="button">Check</button><button class="hintb" type="button">Hint</button></div>`;
+    else if(q.kind==="match"){ const rOrder=shuffle(q.right.map((r,j)=>j));
+      body+=`<p class="how">Tap a box on the left, then its partner on the right.</p><div class="match"><div class="col">${q.left.map((l,j)=>`<button class="mi L" type="button" data-i="${j}">${l}<span class="tagn"></span></button>`).join("")}</div><div class="col">${rOrder.map(j=>`<button class="mi Rt" type="button" data-i="${j}">${q.right[j]}<span class="tagn"></span></button>`).join("")}</div></div><div class="row"><button class="chk" type="button">Check</button><button class="clr" type="button">Clear</button><button class="hintb" type="button">Hint</button></div>`; }
+    else if(q.kind==="drag"){
+      body+=`<p class="how">Drag a card into a box. Or tap a card, then tap a box.</p><div class="pool" data-bin="">${q.items.map((it2,j)=>`<button class="dc" type="button" draggable="true" data-i="${j}">${it2.label}</button>`).join("")}</div><div class="bins" style="grid-template-columns:repeat(${q.bins.length},1fr)">${q.bins.map(b=>`<div class="bin" data-bin="${esc(b)}"><b>${b}</b><div class="drop"></div></div>`).join("")}</div><div class="row"><button class="chk" type="button">Check</button><button class="hintb" type="button">Hint</button></div>`; }
+    body+=`<p class="fb" aria-live="polite"></p><p class="hint">💡 ${q.hint}</p></div>`;
+    li.innerHTML=body; ol.appendChild(li);
+    const fb=li.querySelector(".fb");
+    const lock=()=>li.querySelectorAll("button,input").forEach(x=>{ if(!x.classList.contains("hintb")) x.disabled=true; });
+    li.querySelector(".hintb").onclick=()=>{li.querySelector(".hint").classList.toggle("show"); it.hint=true;};
+    const mark=(ok,given)=>{ if(it.first===null) it.first=ok; if(ok){it.done=true;li.className="card ok";lock();fb.className="fb good";fb.textContent="✅ Correct! "+q.why;} else {li.className="card no"; it.wrong.push(given);} update(); };
+    const oopsMsg=m=>{fb.className="fb oops";fb.textContent=m;};
+
+    if(q.kind==="type"){
+      const inp=li.querySelector(".ans");
+      li.querySelector(".pm").onclick=()=>{ let v=inp.value.trim().replace(/^[+]/,""); inp.value=/^[-\u2212]/.test(v)?v.replace(/^[-\u2212]/,""):M+v; inp.focus(); };
+      const check=()=>{ if(it.done)return; const v=norm(inp.value);
+        if(isNaN(v)){ oopsMsg("Type a number first, like 7, "+M+"7 or "+M+"1/2."); return; }
+        if(Math.abs(v-q.answer)<1e-6) mark(true);
+        else { mark(false,fmt(v)); oopsMsg((Math.abs(v)===Math.abs(q.answer))?"So close! The number is right but check the sign: up or down?":"Not yet. Try again or tap Hint."); } };
+      li.querySelector(".chk").onclick=check; inp.addEventListener("keydown",e=>{if(e.key==="Enter")check();});
+    }
+    if(q.kind==="mc"){
+      li.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ if(it.done)return;
+        if(b.textContent===q.answer){ b.classList.add("right"); mark(true); }
+        else { b.classList.add("wrong"); b.disabled=true; mark(false,b.textContent); oopsMsg("Not this one. Try again or tap Hint."); } });
+    }
+    if(q.kind==="multi"){
+      const opts=[...li.querySelectorAll(".opt")];
+      opts.forEach(b=>b.onclick=()=>{ if(it.done)return; b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")!=="true"); b.classList.remove("wrong"); });
+      li.querySelector(".chk").onclick=()=>{ if(it.done)return;
+        const chosen=opts.filter(b=>b.getAttribute("aria-pressed")==="true").map(b=>b.textContent);
+        if(!chosen.length){ oopsMsg("Tick at least one answer first."); return; }
+        const extra=chosen.filter(c=>!q.answers.includes(c)), missing=q.answers.filter(a=>!chosen.includes(a));
+        if(!extra.length&&!missing.length){ opts.forEach(b=>{ if(q.answers.includes(b.textContent)) b.classList.add("right"); }); mark(true); }
+        else { opts.forEach(b=>{ if(extra.includes(b.textContent)) b.classList.add("wrong"); });
+          mark(false,"chose: "+chosen.join(" | "));
+          oopsMsg(extra.length?`One or more of your ticks is not right (marked in red). ${missing.length?"And there is still one to find.":""}`:`Good so far! There ${missing.length===1?"is 1 more":"are "+missing.length+" more"} to find.`); } };
+    }
+    if(q.kind==="match"){
+      const pairs={}; let sel=null; const COLORS=["#00A7B2","#FAA71C","#66A34E","#C92426","#D77F28"];
+      const Ls=[...li.querySelectorAll(".mi.L")], Rs=[...li.querySelectorAll(".mi.Rt")];
+      const paint=()=>{ Ls.concat(Rs).forEach(b=>{b.style.borderColor="";b.querySelector(".tagn").textContent="";b.classList.remove("sel");});
+        Object.entries(pairs).forEach(([l,r],n)=>{ const c=COLORS[n%COLORS.length]; const lb=Ls[+l], rb=Rs.find(x=>+x.dataset.i===r);
+          lb.style.borderColor=c; rb.style.borderColor=c; lb.querySelector(".tagn").textContent=n+1; rb.querySelector(".tagn").textContent=n+1;
+          lb.querySelector(".tagn").style.background=c; rb.querySelector(".tagn").style.background=c; });
+        if(sel!==null) Ls[sel].classList.add("sel"); };
+      Ls.forEach(b=>b.onclick=()=>{ if(it.done)return; const i2=+b.dataset.i; if(pairs[i2]!==undefined){delete pairs[i2];} sel=i2; paint(); });
+      Rs.forEach(b=>b.onclick=()=>{ if(it.done)return; const r=+b.dataset.i;
+        if(sel===null){ const owner=Object.keys(pairs).find(l=>pairs[l]===r); if(owner!==undefined){delete pairs[owner];paint();} else oopsMsg("Tap a box on the left first."); return; }
+        Object.keys(pairs).forEach(l=>{ if(pairs[l]===r) delete pairs[l]; }); pairs[sel]=r; sel=null; fb.textContent=""; paint(); });
+      li.querySelector(".clr").onclick=()=>{ if(it.done)return; Object.keys(pairs).forEach(k2=>delete pairs[k2]); sel=null; paint(); };
+      li.querySelector(".chk").onclick=()=>{ if(it.done)return;
+        if(Object.keys(pairs).length<q.left.length){ oopsMsg("Match every box on the left first."); return; }
+        const bad=Object.keys(pairs).filter(l=>pairs[l]!==+l);
+        if(!bad.length){ mark(true); }
+        else { mark(false,bad.map(l=>`${plain(q.left[l])} → ${plain(q.right[pairs[l]])}`).join(" | "));
+          bad.forEach(l=>delete pairs[l]); paint();
+          oopsMsg(`${q.left.length-bad.length} of ${q.left.length} pairs are right. The wrong pairs were cleared. Try them again.`); } };
+    }
+    if(q.kind==="drag"){
+      let picked=null; const pool=li.querySelector(".pool");
+      const cards=[...li.querySelectorAll(".dc")];
+      const place=(card,zone)=>{ if(it.done)return; (zone.classList.contains("pool")?zone:zone.querySelector(".drop")).appendChild(card); card.classList.remove("picked","bad"); picked=null; li.querySelectorAll(".bin,.pool").forEach(z=>z.classList.remove("ready")); };
+      cards.forEach(c=>{
+        c.onclick=(e)=>{ if(it.done)return; if(picked&&picked!==c){ e.stopPropagation(); place(picked,c.closest(".bin,.pool")); return; } if(picked===c){c.classList.remove("picked");picked=null;li.querySelectorAll(".bin,.pool").forEach(z=>z.classList.remove("ready"));return;}
+          cards.forEach(x=>x.classList.remove("picked")); picked=c; c.classList.add("picked"); li.querySelectorAll(".bin,.pool").forEach(z=>z.classList.add("ready")); };
+        c.addEventListener("dragstart",e=>{ picked=c; e.dataTransfer.setData("text/plain",c.dataset.i); e.dataTransfer.effectAllowed="move"; });
+      });
+      li.querySelectorAll(".bin,.pool").forEach(z=>{
+        z.addEventListener("click",e=>{ if(picked&&!e.target.closest(".dc")) place(picked,z); });
+        z.addEventListener("dragover",e=>{e.preventDefault();z.classList.add("over");});
+        z.addEventListener("dragleave",()=>z.classList.remove("over"));
+        z.addEventListener("drop",e=>{e.preventDefault();z.classList.remove("over"); const c=cards[+e.dataTransfer.getData("text/plain")]; if(c) place(c,z); });
+      });
+      li.querySelector(".chk").onclick=()=>{ if(it.done)return;
+        if(pool.querySelectorAll(".dc").length){ oopsMsg("Put every card into a box first."); return; }
+        const bad=cards.filter(c=>c.closest(".bin").dataset.bin!==q.items[+c.dataset.i].bin);
+        if(!bad.length){ cards.forEach(c=>c.classList.add("good")); mark(true); }
+        else { mark(false,bad.map(c=>`${c.textContent} → ${c.closest(".bin").dataset.bin}`).join(" | "));
+          bad.forEach(c=>{ pool.appendChild(c); c.classList.add("bad"); });
+          oopsMsg(`${cards.length-bad.length} of ${cards.length} cards are right. The others went back to the top. Try again!`); } };
+    }
+  });
+  update(); }
+
+function update(){
+  const st=DATA[cur]; if(!st) return; const items=st.items;
+  const ok=items.filter(s=>s.done).length, first=items.filter(s=>s.first===true).length;
+  $("score").textContent=`Correct: ${ok} / ${items.length} · First try: ${first}`;
+  $("progBar").style.width=(ok/items.length*100)+"%";
+  const d=SEC[cur].querySelector(".done");
+  if(ok===items.length){ if(!st.finished) st.finished=Date.now(); const stars=first>=14?3:first>=11?2:1;
+    d.innerHTML=`<h2>${"⭐".repeat(stars)} Set ${SETS[cur].id} complete!</h2><p>You got <b>${first}</b> of 15 right on the first try. Tap <b>📋 Copy report for my teacher</b> to share how you did.</p>`;
+    d.className="done show"; }
+  else d.className="done";
+}
+
+/* ===== teacher report ===== */
+function correctText(q){ if(q.kind==="type") return q.show||fmt(q.answer); if(q.kind==="mc") return q.answer;
+  if(q.kind==="multi") return q.answers.join(" | "); if(q.kind==="match") return q.left.map((l,i)=>`${plain(l)} → ${plain(q.right[i])}`).join(" | ");
+  return q.items.map(x=>`${x.label} → ${x.bin}`).join(" | "); }
+function buildReport(){
+  const S=SETS[cur], st=DATA[cur], items=st.items, n=items.length;
+  const name=$("stuName").value.trim()||"(name not entered)";
+  const ok=items.filter(s=>s.done).length, first=items.filter(s=>s.first===true).length;
+  const tried=items.filter(s=>s.first!==null).length, pct=Math.round(first/n*100);
+  const mins=Math.max(1,Math.round(((st.finished||Date.now())-st.started)/60000));
+  const stars=first>=14?3:first>=11?2:1;
+  const group=key=>{const g={}; items.forEach(it=>{const t=key(it); g[t]=g[t]||{n:0,f:0}; g[t].n++; if(it.first===true) g[t].f++;}); return g;};
+  const tags=group(it=>it.q.tag||"Other"), kinds=group(it=>KIND_NAME[it.q.kind]);
+  const lines=g=>Object.entries(g).map(([t,v])=>`  • ${t}: ${v.f}/${v.n} first try${v.f===v.n?" ✓":""}`);
+  const weak=Object.entries(tags).filter(([t,v])=>v.f<v.n).sort((a,b)=>(a[1].f/a[1].n)-(b[1].f/b[1].n)).map(([t])=>t);
+  const help=items.map((it,k)=>({it,k})).filter(x=>x.it.wrong.length);
+  const helpLines=help.length?help.map(({it,k})=>{const q=it.q;
+      let qt=plain(q.text); if(q.pic) qt+=" (number line)";
+      return `  • Q${k+1} [${KIND_NAME[q.kind]}]: ${qt.length>90?qt.slice(0,88)+"…":qt}\n    First answer: ${it.wrong[0]}\n    Correct: ${correctText(q)}${it.done?"":" (not solved yet)"}`;}).join("\n"):"  • None. Every answer was right the first time!";
+  const todo=items.map((it,k)=>it.first===null?"Q"+(k+1):null).filter(Boolean);
+  const hints=items.filter(it=>it.hint).length;
+  let next;
+  if(tried<n) next=`Finish the remaining ${n-tried} question${n-tried>1?"s":""}, then copy the report again.`;
+  else if(pct>=90) next="Secure. Ready to move on.";
+  else if(pct>=70) next=`Nearly there. Review: ${weak.slice(0,2).join(", ")}.`;
+  else next=`Needs support. Revisit with the mentor: ${weak.slice(0,2).join(", ")}.`;
+  const date=new Date().toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
+  return [
+    "MyMasteryLab · "+DOCK_NAME,SESSION_LINE,
+    `Student: ${name}`,`Date: ${date}`,`Set ${S.id}: ${S.name}`,"",
+    `Score: ${ok}/${n} correct · ${first}/${n} first try (${pct}%) ${"⭐".repeat(stars)}`,
+    `Answered: ${tried}/${n} · Time: about ${mins} min · Hints used: ${hints}`,"",
+    "By skill:",...lines(tags),"",
+    "By question type:",...lines(kinds),"",
+    "Needed more than one try:",helpLines,
+    ...(todo.length?["","Not answered yet: "+todo.join(", ")]:[]),"",
+    `Next step: ${next}`
+  ].join("\n");
+}
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200);}
+$("copyBtn").onclick=async()=>{
+  const text=buildReport(); const box=$("reportBox"), ta=$("reportText");
+  ta.value=text; box.classList.add("show");
+  let copied=false;
+  try{ if(navigator.clipboard&&window.isSecureContext){ await navigator.clipboard.writeText(text); copied=true; } }catch(e){}
+  if(!copied){ try{ ta.focus(); ta.select(); copied=document.execCommand("copy"); }catch(e){} }
+  $("reportMsg").textContent=copied?"Copied! Paste it into the chat or email to your teacher.":"Select all the text below and copy it to share with your teacher.";
+  toast(copied?"Report copied ✓":"Select the text to copy it");
+  box.scrollIntoView({behavior:"smooth",block:"nearest"});
+};
+$("newQ").onclick=()=>{ $("reportBox").classList.remove("show"); build(cur); };
+const start=SETS.findIndex(s=>"#set-"+s.id.toLowerCase()===location.hash);
+open(start>=0?start:0);
+window.addEventListener("hashchange",()=>{const k=SETS.findIndex(s=>"#set-"+s.id.toLowerCase()===location.hash); if(k>=0&&k!==cur) open(k);});
+})();
+</script>
+</body>
+</html>

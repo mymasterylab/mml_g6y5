@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Depth Race Practice Dock · Session 4 online worksheets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#00A7B2; --teal2:#42bcb8; --teal3:#00928e; --tealSoft:#E3F6F7; --tealMist:#F3FBFB;
+  --orange:#FAA71C; --burnt:#D77F28; --crimson:#C92426; --emerald:#047857; --leaf:#66A34E;
+  --ink:#151515; --muted:#44585a; --bg:#FFFFFF;
+  color-scheme: light; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 90px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:18px;line-height:1.45}
+h1,h2,h3,.disp{font-family:"Fredoka","Nunito",system-ui,sans-serif;font-weight:600}
+button,input{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible{outline:4px solid var(--orange);outline-offset:2px}
+
+.hero{max-width:1000px;margin:0 auto;padding:18px 18px 4px;display:flex;gap:16px;align-items:center}
+.hero svg{flex:0 0 96px}
+.hero h1{margin:0;color:var(--teal3);font-size:clamp(28px,4.4vw,40px);line-height:1.1}
+.hero p{margin:4px 0 0;color:var(--muted)}
+
+.tabs{position:sticky;top:0;z-index:5;background:#fff;border-bottom:3px solid var(--tealSoft)}
+.tabs::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:#fff;z-index:10}
+.tabs .in{max-width:1000px;margin:0 auto;padding:10px 18px;display:flex;gap:8px;overflow-x:auto}
+.tab{flex:0 0 auto;border:3px solid var(--tealSoft);background:#fff;border-radius:18px;padding:8px 14px;font-weight:800;color:var(--muted);text-align:left}
+.tab small{display:block;font-weight:700;font-size:13px}
+.tab[aria-selected="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
+
+main{max-width:1000px;margin:0 auto;padding:16px 18px 40px}
+.intro{display:flex;gap:14px;align-items:flex-start;background:#FFF6E3;border:2px solid #FDE2AE;border-radius:22px;padding:12px 16px;margin-bottom:16px}
+.intro svg{flex:0 0 58px}
+.intro b.who{display:block;font-family:Fredoka,sans-serif;color:var(--burnt)}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 16px}
+.ctl{border:3px solid var(--tealSoft);background:#fff;border-radius:999px;padding:8px 16px;font-weight:800;color:var(--teal3)}
+.ctl.main{background:var(--orange);border-color:var(--orange);color:#3b2200}
+.score{margin-left:auto;font-weight:800;color:var(--muted)}
+.prog{height:12px;border-radius:999px;background:var(--tealSoft);overflow:hidden;margin:0 0 18px}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--leaf));transition:width .4s}
+
+ol.qs{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.card{border:3px solid var(--tealSoft);border-radius:22px;padding:14px 16px 16px;background:#fff;display:grid;grid-template-columns:44px 1fr;gap:12px}
+.card.ok{border-color:#bfe0b2;background:#F7FBF5}
+.card.no{border-color:#FDE2AE}
+.num{width:40px;height:40px;border-radius:14px;background:var(--teal);color:#fff;display:grid;place-items:center;font-family:Fredoka,sans-serif;font-size:20px}
+.card.ok .num{background:var(--leaf)}
+.qt{font-weight:800;font-size:19px;margin:6px 0 10px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ans{width:150px;border:3px solid var(--tealSoft);border-radius:14px;padding:8px 12px;font-size:20px;font-weight:800}
+.pm{border:3px solid var(--tealSoft);background:var(--tealMist);border-radius:14px;padding:8px 12px;font-weight:800}
+.chk{border:0;border-radius:14px;background:var(--teal);color:#fff;font-weight:800;padding:10px 16px}
+.hintb{border:0;background:none;color:var(--burnt);font-weight:800;text-decoration:underline;padding:6px}
+.opts{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.opt{border:3px solid var(--tealSoft);background:#fff;border-radius:16px;padding:10px 12px;font-weight:800;text-align:left}
+.opt:hover{background:var(--tealMist)}
+.opt.right{background:#E8F4E3;border-color:var(--leaf)}
+.opt.wrong{background:#FDEEEE;border-color:var(--crimson)}
+.fb{margin-top:8px;font-weight:700}
+.fb.good{color:var(--emerald)} .fb.oops{color:#8a4b0f}
+.hint{margin-top:6px;color:var(--muted);display:none}
+.hint.show{display:block}
+.pic{margin:4px 0 8px}
+.pic svg{width:190px;height:auto;border:2px solid var(--tealSoft);border-radius:14px;background:#fff}
+.done{margin-top:20px;text-align:center;border:3px solid var(--orange);border-radius:22px;padding:16px;background:#FFF6E3;display:none}
+.done.show{display:block}
+.done h2{margin:0;color:var(--burnt)}
+@media (max-width:560px){.card{grid-template-columns:1fr}.num{width:36px;height:36px}}
+@media (prefers-reduced-motion:reduce){.prog i{transition:none}}
+
+.name{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--muted)}
+.name input{border:3px solid var(--tealSoft);border-radius:999px;padding:7px 14px;font-weight:800;width:190px}
+.reportBox{display:none;margin:0 0 18px;border:3px solid var(--teal);border-radius:22px;padding:14px 16px;background:var(--tealMist)}
+.reportBox.show{display:block}
+.reportBox h3{margin:0 0 6px;color:var(--teal3);font-size:20px}
+.reportBox p{margin:0 0 8px;color:var(--muted);font-size:16px}
+.reportBox textarea{width:100%;min-height:280px;border:2px solid var(--tealSoft);border-radius:14px;padding:12px;font:600 15px/1.45 "Nunito",system-ui,sans-serif;color:var(--ink);background:#fff;resize:vertical}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(30px);opacity:0;
+  background:var(--emerald);color:#fff;font-weight:800;padding:12px 20px;border-radius:999px;transition:all .3s;z-index:30;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.setSec[hidden]{display:none}
+.kind{display:inline-block;font-size:13px;font-weight:800;border-radius:999px;padding:2px 10px;margin-top:4px;background:var(--tealMist);color:var(--teal3);border:2px solid var(--tealSoft)}
+.k-multi{background:#FFF6E3;color:#8a4b0f;border-color:#FDE2AE}
+.k-match{background:#EEF6EA;color:var(--emerald);border-color:#cfe6c6}
+.k-drag{background:#FDEEEE;color:var(--crimson);border-color:#F5C9C9}
+.blank{display:inline-block;min-width:54px;border-bottom:3px solid var(--orange);color:transparent}
+.how{margin:0 0 8px;color:var(--muted);font-size:15px;font-weight:700}
+.opt.tick{display:flex;align-items:center;gap:10px}
+.opt.tick .box{flex:0 0 22px;width:22px;height:22px;border-radius:7px;border:3px solid var(--teal2);background:#fff}
+.opt.tick[aria-pressed="true"]{background:var(--tealMist);border-color:var(--teal)}
+.opt.tick[aria-pressed="true"] .box{background:var(--teal);box-shadow:inset 0 0 0 3px #fff}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:8px}
+.match .col{display:flex;flex-direction:column;gap:8px}
+.mi{position:relative;border:3px solid var(--tealSoft);background:#fff;border-radius:16px;padding:10px 40px 10px 12px;font-weight:800;text-align:left;min-height:48px}
+.mi.L{background:var(--tealMist)}
+.mi.sel{border-color:var(--orange)!important;box-shadow:0 0 0 3px #FDE2AE}
+.mi .tagn{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;color:#fff;font-size:13px;display:grid;place-items:center}
+.mi .tagn:empty{display:none}
+.pool{display:flex;flex-wrap:wrap;gap:8px;min-height:56px;padding:10px;border:3px dashed var(--tealSoft);border-radius:16px;margin-bottom:10px}
+.bins{display:grid;gap:10px;margin-bottom:8px}
+.bin{border:3px solid var(--tealSoft);border-radius:16px;padding:8px;min-height:110px;background:var(--tealMist)}
+.bin > b{display:block;font-family:Fredoka,sans-serif;font-weight:700;font-size:22px;text-align:center;margin-bottom:6px;color:var(--teal3)}
+.bin .drop{display:flex;flex-direction:column;gap:6px}
+.pool.ready,.bin.ready{border-color:var(--orange)}
+.pool.over,.bin.over{background:#FFF6E3}
+.dc{border:2px solid var(--teal2);background:#fff;border-radius:12px;padding:8px 10px;font-weight:800;font-size:15px;text-align:left;cursor:grab}
+.dc.picked{outline:3px solid var(--orange);background:#FFF6E3}
+.dc.bad{border-color:var(--crimson);background:var(--crimsonSoft,#FDEEEE)}
+.dc.good{border-color:var(--leaf);background:#E8F4E3}
+.clr{border:3px solid var(--tealSoft);background:#fff;border-radius:14px;padding:8px 14px;font-weight:800;color:var(--muted)}
+@media (max-width:560px){.match{gap:8px}.bins{grid-template-columns:1fr!important}}
+
+</style>
+</head>
+<body>
+<header class="hero">
+  <svg viewBox="0 0 96 70" aria-hidden="true"><ellipse cx="48" cy="40" rx="42" ry="22" fill="#00A7B2"/><rect x="36" y="8" width="22" height="16" rx="6" fill="#00928e"/><circle cx="60" cy="40" r="12" fill="#fff" stroke="#FAA71C" stroke-width="4"/><circle cx="63" cy="40" r="5" fill="#151515"/><circle cx="30" cy="40" r="5" fill="#fff"/><circle cx="16" cy="40" r="4" fill="#fff"/></svg>
+  <div><h1>Depth Race Practice Dock</h1><p>Four practice sets with 15 fresh questions each time: fill in, choose one, choose all, match and drag and drop.</p></div>
+</header>
+<nav class="tabs" aria-label="Practice sets"><div class="in" role="tablist" id="tabs"></div></nav>
+<main>
+  <div class="intro" id="intro"></div>
+  <div class="bar">
+    <label class="name">Your name <input id="stuName" type="text" autocomplete="off" placeholder="Type your name"></label>
+    <button class="ctl main" id="newQ">🔄 New questions</button>
+    <button class="ctl" id="copyBtn">📋 Copy report for my teacher</button>
+    <span class="score" id="score" aria-live="polite"></span>
+  </div>
+  <section class="reportBox" id="reportBox" aria-live="polite">
+    <h3>Your report for this set</h3>
+    <p id="reportMsg">Copied! Paste it into the chat with your teacher.</p>
+    <textarea id="reportText" readonly aria-label="Performance report text"></textarea>
+  </section>
+  <div class="prog" aria-hidden="true"><i id="progBar"></i></div>
+  <div id="host"></div>
+</main>
+<div class="toast" id="toast" role="status">Report copied ✓</div>
+
+<script>
+(function(){
+"use strict";
+const M="\u2212";
+const fmt=n=>{const s=Math.abs(n).toLocaleString("en-US");return n>0?"+"+s:(n<0?M+s:"0");};
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const pick=(a,n)=>shuffle(a).slice(0,n);
+const one=a=>a[Math.floor(Math.random()*a.length)];
+const $=id=>document.getElementById(id);
+const ECHO=`<svg viewBox="0 0 58 58" aria-hidden="true"><circle cx="29" cy="29" r="28" fill="#fff"/><ellipse cx="29" cy="33" rx="24" ry="14" fill="#00A7B2"/><rect x="23" y="12" width="12" height="10" rx="4" fill="#00928e"/><circle cx="36" cy="33" r="7" fill="#fff" stroke="#FAA71C" stroke-width="3"/><circle cx="38" cy="33" r="3" fill="#151515"/></svg>`;
+
+/* ===== question makers =====
+   kinds: type (fill), mc (one answer), multi (select all), match (pair columns), drag (sort into bins) */
+const T=(text,answer,hint,why,pic,tag)=>({kind:"type",text,answer,hint,why,pic,tag});
+const C=(text,right,wrongs,hint,why,pic,tag)=>({kind:"mc",text,options:shuffle([right].concat(wrongs)),answer:right,hint,why,pic,tag});
+const MU=(text,rights,wrongs,hint,why,pic,tag)=>({kind:"multi",text,options:shuffle(rights.concat(wrongs)),answers:rights,hint,why,pic,tag});
+const MA=(text,pairs,hint,why,pic,tag)=>({kind:"match",text,left:pairs.map(p=>p[0]),right:pairs.map(p=>p[1]),hint,why,pic,tag});
+const DR=(text,bins,items,hint,why,pic,tag)=>({kind:"drag",text,bins,items:shuffle(items),hint,why,pic,tag});
+const OR=(text,inOrder,hint,why,pic,tag,labels)=>({kind:"order",text,answer:inOrder,hint,why,pic,tag,labels});
+const KIND_NAME={order:"Put in order (drag and drop)",type:"Fill in the blank",mc:"Multiple choice (one answer)",multi:"Multiple choice (more than one answer)",match:"Match the columns",drag:"Drag and drop"};
+
+function lineSVG(vals,labelEvery,marks){
+  const n=vals.length, top=24, bot=286, gap=(bot-top)/(n-1), x=86;
+  let s=`<svg viewBox="0 0 190 310" role="img" aria-label="Vertical number line">`;
+  const zi=vals.indexOf(0), zy=top+zi*gap;
+  s+=`<rect x="0" y="0" width="190" height="${zy}" fill="#F3FBFB"/><rect x="0" y="${zy}" width="190" height="${310-zy}" fill="#CFEFF0"/>`;
+  s+=`<line x1="${x}" y1="${top-12}" x2="${x}" y2="${bot+12}" stroke="#151515" stroke-width="3"/>`;
+  s+=`<path d="M${x} ${top-20} l-7 12 h14z M${x} ${bot+20} l-7 -12 h14z" fill="#151515"/>`;
+  vals.forEach((v,i)=>{const y=top+i*gap;
+    s+=`<line x1="${x-10}" y1="${y}" x2="${x+10}" y2="${y}" stroke="#151515" stroke-width="2"/>`;
+    if(v===0||i%labelEvery===zi%labelEvery) s+=`<text x="${x-16}" y="${y+6}" text-anchor="end" font-family="Fredoka,Nunito,sans-serif" font-size="16" font-weight="600" fill="${v>0?'#00928e':v<0?'#C92426':'#151515'}">${fmt(v)}</text>`;});
+  marks.forEach(([i,label])=>{const y=top+i*gap;
+    s+=`<circle cx="${x}" cy="${y}" r="8" fill="#FAA71C" stroke="#151515" stroke-width="2"/>`;
+    s+=`<text x="${x+20}" y="${y+6}" font-family="Fredoka,Nunito,sans-serif" font-size="17" font-weight="700" fill="#151515">${label}</text>`;});
+  return s+"</svg>";
+}
+function makeLine(){ const step=one([1,1,2,2,5,10]), half=one([4,5]); const vals=[]; for(let k=half;k>=-half;k--) vals.push(k*step); return {vals,step,labelEvery:Math.random()<.45?2:1}; }
+/* ---------- extra picture helpers ---------- */
+const lab=v=>{ if(typeof v==="string") return v; const r=Math.round(v*1000)/1000; return r>0?"+"+r:(r<0?M+Math.abs(r):"0"); };
+function hlineSVG(lo,hi,step,marks,opts={}){
+  const n=Math.round((hi-lo)/step), W=420, pad=26, y=56, X=v=>pad+(v-lo)/(hi-lo)*(W-2*pad), every=opts.every||1;
+  let s=`<svg viewBox="0 0 ${W} 100" role="img" aria-label="Number line" style="width:100%;max-width:420px">`;
+  s+=`<line x1="${pad-12}" y1="${y}" x2="${W-pad+12}" y2="${y}" stroke="#151515" stroke-width="2.5"/><path d="M${pad-18} ${y} l12 -7 v14z M${W-pad+18} ${y} l-12 -7 v14z" fill="#151515"/>`;
+  for(let k=0;k<=n;k++){ const v=+(lo+k*step).toFixed(6), x=X(v);
+    const labels=opts.labels; let t=null;
+    if(labels){ const f=labels.find(l=>Math.abs(l[0]-v)<1e-6); if(f) t=f[1]; }
+    else if(k%every===0||v===0) t=lab(v);
+    const big=t!==null; s+=`<line x1="${x}" y1="${y-(big?11:6)}" x2="${x}" y2="${y+(big?11:6)}" stroke="#151515" stroke-width="${v===0?3:big?2.4:1.4}"/>`;
+    if(t!==null) s+=`<text x="${x}" y="${y+27}" text-anchor="middle" font-family="Fredoka,Nunito,sans-serif" font-size="15" font-weight="600" fill="${v>0?'#00928e':v<0?'#C92426':'#151515'}">${t}</text>`; }
+  (marks||[]).forEach(([v,l,c])=>{ const x=X(v); s+=`<circle cx="${x}" cy="${y}" r="8" fill="${c||'#FAA71C'}" stroke="#151515" stroke-width="2"/>`; if(l) s+=`<text x="${x}" y="${y-15}" text-anchor="middle" font-family="Fredoka,Nunito,sans-serif" font-size="16" font-weight="700">${l}</text>`; });
+  return s+"</svg>";
+}
+function planeSVG(r,points,segs){
+  const W=300,pad=22,c=W/2,u=(W-2*pad)/(2*r),P=(x,y)=>[c+x*u,c-y*u];
+  let s=`<svg viewBox="0 0 ${W} ${W}" role="img" aria-label="Coordinate plane" style="width:100%;max-width:300px">`;
+  s+=`<rect x="${pad}" y="${pad}" width="${c-pad}" height="${c-pad}" fill="#F3FBFB"/><rect x="${c}" y="${pad}" width="${c-pad}" height="${c-pad}" fill="#FFF6E3"/><rect x="${pad}" y="${c}" width="${c-pad}" height="${c-pad}" fill="#EEF6EA"/><rect x="${c}" y="${c}" width="${c-pad}" height="${c-pad}" fill="#FDEEEE"/>`;
+  for(let k=-r;k<=r;k++){ const [x]=P(k,0),[,y]=P(0,k); s+=`<line x1="${x}" y1="${pad}" x2="${x}" y2="${W-pad}" stroke="#d3eaec"/><line x1="${pad}" y1="${y}" x2="${W-pad}" y2="${y}" stroke="#d3eaec"/>`;
+    if(k&&k%2===0) s+=`<text x="${x}" y="${c+14}" text-anchor="middle" font-family="Nunito" font-size="10" font-weight="700" fill="#44585a">${k<0?M+(-k):k}</text><text x="${c-5}" y="${y+4}" text-anchor="end" font-family="Nunito" font-size="10" font-weight="700" fill="#44585a">${k<0?M+(-k):k}</text>`; }
+  s+=`<line x1="${pad-8}" y1="${c}" x2="${W-pad+8}" y2="${c}" stroke="#151515" stroke-width="2"/><line x1="${c}" y1="${pad-8}" x2="${c}" y2="${W-pad+8}" stroke="#151515" stroke-width="2"/>`;
+  (segs||[]).forEach(([a,b,col])=>{ const p=P(a[0],a[1]),q=P(b[0],b[1]); s+=`<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="${col||'#D77F28'}" stroke-width="3" stroke-dasharray="6 4"/>`; });
+  (points||[]).forEach(([x,y,l,col])=>{ const [px,py]=P(x,y); s+=`<circle cx="${px}" cy="${py}" r="6" fill="${col||'#FAA71C'}" stroke="#151515" stroke-width="1.8"/>`; if(l) s+=`<text x="${px+8}" y="${py-7}" font-family="Fredoka,Nunito" font-size="14" font-weight="700">${l}</text>`; });
+  return s+"</svg>";
+}
+const fracStr=(n,d)=>{ const neg=n<0; n=Math.abs(n); const w=Math.floor(n/d), r=n%d; let t=r===0?String(w):(w?`${w} ${r}/${d}`:`${r}/${d}`); return (neg?M:"")+t; };
+const DOCK_NAME="Depth Race Practice Dock", SESSION_LINE="Session 4: Comparing and ordering rational numbers";
+const S=n=>{ const r=Math.round(n*100)/100; return r>0?"+"+r:(r<0?M+Math.abs(r):"0"); };
+const sym=(a,b)=>a<b?"<":a>b?">":"=";
+const rv=()=>one([()=>-R(1,20),()=>R(0,20),()=>-(R(1,9)+0.5),()=>-R(1,9)-0.25]) ();
+const two=()=>{ let a,b; do{ a=rv(); b=rv(); }while(a===b); return [a,b]; };
+const CMP="Comparing two numbers", ORD="Ordering numbers", INQ="Inequalities in real life", LINE="Comparing on a number line";
+function setA(){
+  const qs=[];
+  for(let k=0;k<4;k++){ const [a,b]=k<2?[-R(2,9),-R(10,20)]:two(); qs.push(T(`The greater of <b>${S(a)}</b> and <b>${S(b)}</b> is ____`,Math.max(a,b),"Greater means further right or higher. For negatives, closer to 0 is greater.",`${S(Math.max(a,b))} is greater.`,null,CMP)); }
+  for(let k=0;k<2;k++){ const [a,b]=[-R(1,9),-R(10,30)]; qs.push(T(`The <b>less</b> of <b>${S(a)}</b> and <b>${S(b)}</b> is ____`,Math.min(a,b),"Less means further left or lower.",`${S(Math.min(a,b))} is less.`,null,CMP)); }
+  qs.push(T(`The greater of <b>0</b> and <b>${S(-R(1,50))}</b> is ____`,0,"Zero is greater than every negative number.","0 is greater.",null,CMP));
+  for(let k=0;k<3;k++){ const [a,b]=two(); qs.push(C(`Choose the sign: <b>${S(a)} __ ${S(b)}</b>`,sym(a,b),["<",">","="].filter(x=>x!==sym(a,b)),"The open side faces the greater number.",`${S(a)} ${sym(a,b)} ${S(b)}.`,null,CMP)); }
+  { const n=R(2,9); qs.push(C(`Choose the sign: <b>${M}${n} __ ${M}(${n})</b>`,"=",["<",">"],`${M}(${n}) is the opposite of ${n}.`,"They are the same number.",null,CMP)); }
+  { const ts=[[`${M}6 < ${M}2`,1],[`${M}1 > ${M}10`,1],[`0 > ${M}0.5`,1],[`${M}6 > ${M}2`,0],[`${M}3 > 1`,0],[`${M}4.5 > ${M}4`,0]];
+    qs.push(MU("Tick ALL the true statements.",ts.filter(t=>t[1]).map(t=>t[0]),ts.filter(t=>!t[1]).map(t=>t[0]),"Picture them on a number line.","Left is less, right is greater.",null,CMP)); }
+  { const n=-R(3,8); qs.push(MU(`Tick ALL the numbers <b>greater than ${S(n)}</b>.`,[S(n+1),S(n+2.5),"0"],[S(n-1),S(n-4),S(n-0.5)],"Greater means closer to 0 (or past it).","These are to the right of "+S(n)+".",null,CMP)); }
+  { const p=[two(),two(),two(),two()]; qs.push(MA("Match each pair to its sign.",p.map(([a,b],i)=>[`${S(a)} __ ${S(b)}`,""]).map((x,i)=>x),"","",null,CMP)); qs.pop(); }
+  { const ps=[[-3,-8],[-8,-3],[-5,-5]]; qs.push(MA("Match each comparison to the right sign.",[[`${M}3 __ ${M}8`,">"],[`${M}8 __ ${M}3`,"<"],[`${M}5 __ ${M}(5)`,"="]],"Closer to 0 is greater.","All matched!",null,CMP)); }
+  { const n=-R(2,6); const items=[n-3,n-1.5,n-0.5,n+1,n+4,0].map(v=>({label:S(v),bin:v<n?"Less than "+S(n):"Greater than "+S(n)}));
+    qs.push(DR(`Drag each number to the right side of <b>${S(n)}</b>.`,["Less than "+S(n),"Greater than "+S(n)],items,"Left is less, right is greater.","All sorted!",null,CMP)); }
+  return shuffle(qs);
+}
+function setB(){
+  const qs=[];
+  const mk=n=>{ const s=new Set(); while(s.size<n) s.add(rv()); return [...s]; };
+  for(let k=0;k<4;k++){ const v=mk(k<2?4:5).sort((a,b)=>a-b); qs.push(OR("Put these in order from <b>least</b> to <b>greatest</b>.",v.map(S),"Start with the number furthest left (the most negative).",v.map(S).join(" < "),null,ORD,["least","greatest"])); }
+  for(let k=0;k<2;k++){ const v=mk(4).sort((a,b)=>b-a); qs.push(OR("Put these in order from <b>greatest</b> to <b>least</b>.",v.map(S),"Start with the number furthest right.",v.map(S).join(" > "),null,ORD,["greatest","least"])); }
+  for(let k=0;k<2;k++){ const v=mk(4); const lo=Math.min(...v), hi=Math.max(...v);
+    qs.push(T(`Which is the ${k?"greatest":"least"}? ${v.map(S).join(", ")} → ____`,k?hi:lo,"Picture them on a number line.",`${S(k?hi:lo)}.`,null,ORD)); }
+  { const v=mk(4); const lo=Math.min(...v); qs.push(C(`Which is the <b>least</b>: ${v.map(S).join(", ")}?`,S(lo),v.filter(x=>x!==lo).map(S),"The least is furthest left.",`${S(lo)} is the least.`,null,ORD)); }
+  { const v=[-7,-2.5,0,3]; qs.push(C(`Which list is in order from least to greatest?`,v.map(S).join(", "),[[3,0,-2.5,-7],[-2.5,-7,0,3],[0,-2.5,-7,3]].map(x=>x.map(S).join(", ")),"Negatives first, then 0, then positives.","That list increases left to right.",null,ORD)); }
+  { const v=mk(5).sort((a,b)=>a-b); qs.push(MU(`These are in order: ${v.map(S).join(" < ")}. Tick ALL the true sentences.`,[`${S(v[0])} is the least.`,`${S(v[4])} is the greatest.`],[`${S(v[0])} is the greatest.`,`${S(v[2])} is the least.`],"In a list from least to greatest, the first is least.","Correct!",null,ORD)); }
+  { const v=mk(4).sort((a,b)=>a-b); qs.push(MA("Match each position to its number (least to greatest).",[["1st (least)",S(v[0])],["2nd",S(v[1])],["3rd",S(v[2])],["4th (greatest)",S(v[3])]],"Order them first.","All matched!",null,ORD)); }
+  { const items=[-9,-4.5,-1].map(v=>({label:S(v),bin:"Negative"})).concat([{label:"0",bin:"Zero"}],[2,7.5].map(v=>({label:S(v),bin:"Positive"})));
+    qs.push(DR("Drag each number into its group. Which group is always least?",["Negative","Zero","Positive"],items,"Negatives are always less than 0.","All sorted!",null,ORD)); }
+  { const n=-R(2,6); const items=[n-4,n-1,n+0.5,n+3,0].map(v=>({label:S(v),bin:v<n?"Before "+S(n):"After "+S(n)}));
+    qs.push(DR(`In a list from least to greatest, does each number come before or after <b>${S(n)}</b>?`,["Before "+S(n),"After "+S(n)],items,"Smaller numbers come first.","All sorted!",null,ORD)); }
+  { const v=mk(5).sort((a,b)=>a-b); qs.push(OR("Order these from least to greatest.",v.map(S),"Most negative first.",v.map(S).join(" < "),null,ORD,["least","greatest"])); }
+  return shuffle(qs);
+}
+function setC(){
+  const qs=[];
+  const T1=()=>{ const a=-R(2,15),b=-R(2,15); return a===b?T1():[a,b]; };
+  { const [a,b]=T1(); qs.push(T(`It is ${S(a)} °C in Oslo and ${S(b)} °C in Moscow. The <b>colder</b> temperature is ____ °C`,Math.min(a,b),"Colder means less.",`${S(Math.min(a,b))} °C is colder.`,null,INQ)); }
+  { const [a,b]=T1(); qs.push(T(`A crab is at ${S(a)} m and a turtle at ${S(b)} m. The <b>higher</b> one is at ____ m`,Math.max(a,b),"Higher means greater.",`${S(Math.max(a,b))} m is higher.`,null,INQ)); }
+  { const a=-R(5,40),b=-R(5,40); qs.push(T(`Mira’s balance is $${a}, Leo’s is $${b}. The <b>greater</b> balance is $____`,Math.max(a,b),"A smaller debt is a greater balance.",`$${Math.max(a,b)}.`,null,INQ)); }
+  { const d=-R(3,12); qs.push(T(`A fish is at ${S(d)} m. A crab is 2 m deeper. The crab is at ____ m`,d-2,"Deeper means less.",`${S(d-2)} m.`,null,INQ)); }
+  { const t=-R(1,6); qs.push(T(`Write a temperature 1 degree warmer than ${S(t)} °C: ____ °C`,t+1,"Warmer means greater: go up.",`${S(t+1)} °C.`,null,INQ)); }
+  { qs.push(T(`The temperature is ${M}4 °C. It drops to the next whole degree colder. It is now ____ °C`,-5,"Colder means less: go down.",M+"5 °C.",null,INQ)); }
+  { const a=-R(2,9); qs.push(C(`Which statement says “${S(a)} °C is colder than 1 °C”?`,`${S(a)} < 1`,[`${S(a)} > 1`,`1 < ${S(a)}`,`${S(a)} = 1`],"Colder is less.",`${S(a)} < 1.`,null,INQ)); }
+  { qs.push(C(`What does <b>${M}20 < ${M}5</b> mean for depths?`,`${M}20 m is deeper than ${M}5 m`,[`${M}20 m is higher than ${M}5 m`,"They are at the same depth",`${M}5 m is deeper than ${M}20 m`],"Less depth value means deeper.","Correct!",null,INQ)); }
+  { qs.push(C(`A submarine at ${M}12 m and a diver at ${M}30 m. Which is true?`,`${M}12 > ${M}30`,[`${M}12 < ${M}30`,`${M}12 = ${M}30`],"The submarine is higher.","Correct!",null,INQ)); }
+  { qs.push(MU("Tick ALL the statements that mean the same as <b>"+M+"3 < 2</b>.",[`2 > ${M}3`,`${M}3 is less than 2`,`${M}3 is to the left of 2`],[`${M}3 > 2`,`2 < ${M}3`,`${M}3 is to the right of 2`],"Flip the sentence and the sign together.","These all mean the same.",null,INQ)); }
+  { qs.push(MU("Tick ALL the true sentences about owing money.",["Owing $10 is worse than owing $3.",`${M}10 < ${M}3`],[`${M}10 > ${M}3`,"Owing $10 is the same as owing $3."],"Owing more means a lower balance.","Correct!",null,INQ)); }
+  for(let k=0;k<2;k++) qs.push(MA("Match each story to its statement.",shuffle([[`${M}6 °C is colder than ${M}1 °C`,`${M}6 < ${M}1`],[`${M}2 m is higher than ${M}9 m`,`${M}2 > ${M}9`],[`A $5 debt is less than $0`,`${M}5 < 0`],[`3 m above is higher than 1 m below`,`3 > ${M}1`]]).slice(0,4),"Colder, deeper and owing are “less”.","All matched!",null,INQ));
+  { const items=[{label:`${M}8 °C`,bin:"Colder than "+M+"3 °C"},{label:`${M}3.5 °C`,bin:"Colder than "+M+"3 °C"},{label:`${M}12 °C`,bin:"Colder than "+M+"3 °C"},{label:`${M}1 °C`,bin:"Warmer than "+M+"3 °C"},{label:"0 °C",bin:"Warmer than "+M+"3 °C"},{label:"4 °C",bin:"Warmer than "+M+"3 °C"}];
+    qs.push(DR(`Drag each temperature: colder or warmer than ${M}3 °C?`,["Colder than "+M+"3 °C","Warmer than "+M+"3 °C"],items,"Colder means less.","All sorted!",null,INQ)); }
+  { const items=[{label:`${M}40 m`,bin:"Deeper than "+M+"25 m"},{label:`${M}25.5 m`,bin:"Deeper than "+M+"25 m"},{label:`${M}10 m`,bin:"Higher than "+M+"25 m"},{label:`${M}24 m`,bin:"Higher than "+M+"25 m"},{label:`${M}100 m`,bin:"Deeper than "+M+"25 m"}];
+    qs.push(DR(`Drag each depth: deeper or higher than ${M}25 m?`,["Deeper than "+M+"25 m","Higher than "+M+"25 m"],items,"Deeper means less.","All sorted!",null,INQ)); }
+  return shuffle(qs);
+}
+function setD(){
+  const qs=[]; const L="ABCD".split("");
+  for(let k=0;k<4;k++){ let p,q; do{ p=R(-8,8); q=R(-8,8);}while(p===q);
+    qs.push(T(`Which point is greater, P or Q? Type its value: ____`,Math.max(p,q),"Right is greater.",`${S(Math.max(p,q))} is further right.`,hlineSVG(-8,8,1,[[p,"P"],[q,"Q","#00A7B2"]],{every:2}),LINE)); }
+  for(let k=0;k<2;k++){ const v=pick([-7,-5,-3,-1,0,2,4,6],3); qs.push(T(`Which point is furthest <b>left</b>? Type its value: ____`,Math.min(...v),"Furthest left is the least.",`${S(Math.min(...v))} is the least.`,hlineSVG(-8,8,1,v.map((x,i)=>[x,L[i]]),{every:2}),LINE)); }
+  { const v=pick([-8,-6,-4,-2,0,2],1)[0]; const vals=[];for(let x=6;x>=-6;x--) vals.push(x); qs.push(T(`On this tall line, which number is just <b>below</b> the dot? ____`,v-1,"Below means less.",`${S(v-1)}.`,lineSVG(vals,2,[[6-v,"dot"]]),LINE)); }
+  for(let k=0;k<3;k++){ const v=pick([-7,-5,-4,-2,0,1,3,6],4); const t=Math.max(...v); qs.push(C("Which letter shows the <b>greatest</b> number?",L[v.indexOf(t)],L.filter((x,i)=>v[i]!==t),"Greatest is furthest right.",`Letter ${L[v.indexOf(t)]}.`,hlineSVG(-8,8,1,v.map((x,i)=>[x,L[i]]),{every:2}),LINE)); }
+  { const v=pick([-7,-6,-4,-3,-1,1,3,5],4); const ref=v[0]; qs.push(MU(`Tick ALL the letters with a number <b>less than A</b>.`,L.filter((x,i)=>v[i]<ref),L.filter((x,i)=>v[i]>=ref),"Less than A means left of A.","These are left of A.",hlineSVG(-8,8,1,v.map((x,i)=>[x,L[i]]),{every:2}),LINE)); qs[qs.length-1].answers.length||qs.pop(); }
+  { const v=pick([-6,-5,-3,-2,0,2,4],4).sort((a,b)=>a-b); qs.push(MA("Match each letter to its number.",v.map((x,i)=>[`Letter ${L[i]}`,S(x)]),"Read left to right.","All matched!",hlineSVG(-8,8,1,v.map((x,i)=>[x,L[i]]),{every:2}),LINE)); }
+  { const v=pick([-7,-5,-2,1,4,6],4); qs.push(OR("Order the letters by their numbers, least to greatest.",v.slice().sort((a,b)=>a-b).map(x=>L[v.indexOf(x)]),"Read the line from left to right.","Correct order!",hlineSVG(-8,8,1,v.map((x,i)=>[x,L[i]]),{every:2}),LINE,["least","greatest"])); }
+  { const items=[-6,-3,-0.5,1,4].map(v=>({label:S(v),bin:v<-2?"Left of "+M+"2":"Right of "+M+"2"}));
+    qs.push(DR(`Drag each number: left or right of ${M}2 on a number line?`,["Left of "+M+"2","Right of "+M+"2"],items,"Left means less.","All sorted!",null,LINE)); }
+  while(qs.length<15){ let p,q; do{ p=R(-8,8); q=R(-8,8);}while(p===q); qs.push(C(`Choose the sign for the points: <b>P __ Q</b>`,sym(p,q),["<",">"].filter(x=>x!==sym(p,q)),"P is left of Q means P < Q.",`P ${sym(p,q)} Q.`,hlineSVG(-8,8,1,[[p,"P"],[q,"Q","#00A7B2"]],{every:2}),LINE)); }
+  return shuffle(qs).slice(0,15);
+}
+const SETS=[
+ {id:"A",name:"Greater or less?",make:setA,intro:"Closer to 0 is greater for negative numbers. Every negative is less than 0 and every positive."},
+ {id:"B",name:"Order them",make:setB,intro:"Put numbers in order. Start with the most negative for least to greatest."},
+ {id:"C",name:"Real-life inequalities",make:setC,intro:"Colder, deeper and owing more are all “less”. Write the right sign!"},
+ {id:"D",name:"Read the line",make:setD,intro:"On a number line, left is less and right is greater."}
+];
+/* ===== sets & rendering ===== */
+let cur=0;
+const DATA=[], SEC=[];
+const tabs=$("tabs"), host=$("host");
+SETS.forEach((s,i)=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.id="tab"+i;
+  b.innerHTML=`Set ${s.id}<small>${s.name}</small>`;b.onclick=()=>open(i);tabs.appendChild(b);
+  const sec=document.createElement("section");sec.className="setSec";sec.hidden=true;
+  sec.innerHTML=`<ol class="qs"></ol><div class="done"></div>`;host.appendChild(sec);SEC.push(sec);DATA.push(null);});
+
+function norm(v){ v=String(v).trim().replace(/[\u2212\u2013\u2014]/g,"-").replace(/[$,°a-zA-Z]/g,"").trim();
+  let m=v.match(/^([+-]?)\s*(\d+)\s+(\d+)\s*\/\s*(\d+)$/); if(m) return (m[1]==="-"?-1:1)*(+m[2]+(+m[3])/(+m[4]));
+  m=v.match(/^([+-]?)\s*(\d+)\s*\/\s*(\d+)$/); if(m) return (m[1]==="-"?-1:1)*(+m[2])/(+m[3]);
+  v=v.replace(/\s/g,""); if(!/^[+-]?\d*\.?\d+$/.test(v)) return NaN; return parseFloat(v); }
+const plain=h=>{const d=document.createElement("div");d.innerHTML=h;return d.textContent.replace(/\s+/g," ").trim();};
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const BADGE={order:"🖐️ Put in order",type:"✏️ Fill in",mc:"🔘 Choose one",multi:"☑️ Choose all that fit",match:"🔗 Match",drag:"🖐️ Drag and drop"};
+
+function open(i){ cur=i; [...tabs.children].forEach((b,k)=>b.setAttribute("aria-selected",k===i));
+  SEC.forEach((s,k)=>s.hidden=k!==i);
+  $("intro").innerHTML=ECHO+`<div><b class="who">Echo says</b>${SETS[i].intro}</div>`;
+  $("reportBox").classList.remove("show");
+  if(location.hash!=="#set-"+SETS[i].id.toLowerCase()) history.replaceState(null,"","#set-"+SETS[i].id.toLowerCase());
+  if(!DATA[i]) build(i); else update(); }
+
+function questionText(q){ return q.text.replace("____",'<span class="blank">____</span>'); }
+
+function build(i){
+  const sec=SEC[i], st={started:Date.now(),finished:null,items:SETS[i].make().map(q=>({q,done:false,first:null,wrong:[]}))};
+  DATA[i]=st;
+  const ol=sec.querySelector("ol"); ol.innerHTML=""; sec.querySelector(".done").className="done";
+  st.items.forEach((it,k)=>{ const q=it.q; const li=document.createElement("li"); li.className="card"; li.dataset.kind=q.kind;
+    let body=`<div class="num">${k+1}</div><div><span class="kind k-${q.kind}">${BADGE[q.kind]}</span><p class="qt">${questionText(q)}</p>${q.pic?`<div class="pic">${q.pic}</div>`:""}`;
+    if(q.kind==="type") body+=`<div class="row"><button class="pm" type="button" aria-label="Add or remove a minus sign">±</button><input class="ans" type="text" inputmode="decimal" autocomplete="off" aria-label="Your answer for question ${k+1}"><button class="chk" type="button">Check</button><button class="hintb" type="button">Hint</button></div>`;
+    else if(q.kind==="mc") body+=`<div class="opts">${q.options.map(o=>`<button class="opt" type="button">${o}</button>`).join("")}</div><button class="hintb" type="button">Hint</button>`;
+    else if(q.kind==="multi") body+=`<div class="opts">${q.options.map(o=>`<button class="opt tick" type="button" aria-pressed="false"><span class="box" aria-hidden="true"></span>${o}</button>`).join("")}</div><div class="row"><button class="chk" type="button">Check</button><button class="hintb" type="button">Hint</button></div>`;
+    else if(q.kind==="match"){ const rOrder=shuffle(q.right.map((r,j)=>j));
+      body+=`<p class="how">Tap a box on the left, then its partner on the right.</p><div class="match"><div class="col">${q.left.map((l,j)=>`<button class="mi L" type="button" data-i="${j}">${l}<span class="tagn"></span></button>`).join("")}</div><div class="col">${rOrder.map(j=>`<button class="mi Rt" type="button" data-i="${j}">${q.right[j]}<span class="tagn"></span></button>`).join("")}</div></div><div class="row"><button class="chk" type="button">Check</button><button class="clr" type="button">Clear</button><button class="hintb" type="button">Hint</button></div>`; }
+    else if(q.kind==="drag"){
+      body+=`<p class="how">Drag a card into a box. Or tap a card, then tap a box.</p><div class="pool" data-bin="">${q.items.map((it2,j)=>`<button class="dc" type="button" draggable="true" data-i="${j}">${it2.label}</button>`).join("")}</div><div class="bins" style="grid-template-columns:repeat(${q.bins.length},1fr)">${q.bins.map(b=>`<div class="bin" data-bin="${esc(b)}"><b>${b}</b><div class="drop"></div></div>`).join("")}</div><div class="row"><button class="chk" type="button">Check</button><button class="hintb" type="button">Hint</button></div>`; }
+    else if(q.kind==="order"){ const sh=shuffle(q.answer.map((t,j)=>j));
+      body+=`<p class="how">Tap the cards in order${q.labels?`: <b>${q.labels[0]}</b> first, <b>${q.labels[1]}</b> last`:""}. Tap a placed card to take it back.</p><div class="pool">${sh.map(j=>`<button class="dc" type="button" data-i="${j}">${q.answer[j]}</button>`).join("")}</div><div class="bins" style="grid-template-columns:repeat(${q.answer.length},1fr)">${q.answer.map((t,j)=>`<div class="bin" style="min-height:70px"><b style="font-size:16px">${j+1}</b><div class="drop"></div></div>`).join("")}</div><div class="row"><button class="chk" type="button">Check</button><button class="hintb" type="button">Hint</button></div>`; }
+    body+=`<p class="fb" aria-live="polite"></p><p class="hint">💡 ${q.hint}</p></div>`;
+    li.innerHTML=body; ol.appendChild(li);
+    const fb=li.querySelector(".fb");
+    const lock=()=>li.querySelectorAll("button,input").forEach(x=>{ if(!x.classList.contains("hintb")) x.disabled=true; });
+    li.querySelector(".hintb").onclick=()=>{li.querySelector(".hint").classList.toggle("show"); it.hint=true;};
+    const mark=(ok,given)=>{ if(it.first===null) it.first=ok; if(ok){it.done=true;li.className="card ok";lock();fb.className="fb good";fb.textContent="✅ Correct! "+q.why;} else {li.className="card no"; it.wrong.push(given);} update(); };
+    const oopsMsg=m=>{fb.className="fb oops";fb.textContent=m;};
+
+    if(q.kind==="type"){
+      const inp=li.querySelector(".ans");
+      li.querySelector(".pm").onclick=()=>{ let v=inp.value.trim().replace(/^[+]/,""); inp.value=/^[-\u2212]/.test(v)?v.replace(/^[-\u2212]/,""):M+v; inp.focus(); };
+      const check=()=>{ if(it.done)return; const v=norm(inp.value);
+        if(isNaN(v)){ oopsMsg("Type a number first, like 7, "+M+"7 or "+M+"1/2."); return; }
+        if(Math.abs(v-q.answer)<1e-6) mark(true);
+        else { mark(false,fmt(v)); oopsMsg((Math.abs(v)===Math.abs(q.answer))?"So close! The number is right but check the sign: up or down?":"Not yet. Try again or tap Hint."); } };
+      li.querySelector(".chk").onclick=check; inp.addEventListener("keydown",e=>{if(e.key==="Enter")check();});
+    }
+    if(q.kind==="mc"){
+      li.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ if(it.done)return;
+        if(b.textContent===q.answer){ b.classList.add("right"); mark(true); }
+        else { b.classList.add("wrong"); b.disabled=true; mark(false,b.textContent); oopsMsg("Not this one. Try again or tap Hint."); } });
+    }
+    if(q.kind==="multi"){
+      const opts=[...li.querySelectorAll(".opt")];
+      opts.forEach(b=>b.onclick=()=>{ if(it.done)return; b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")!=="true"); b.classList.remove("wrong"); });
+      li.querySelector(".chk").onclick=()=>{ if(it.done)return;
+        const chosen=opts.filter(b=>b.getAttribute("aria-pressed")==="true").map(b=>b.textContent);
+        if(!chosen.length){ oopsMsg("Tick at least one answer first."); return; }
+        const extra=chosen.filter(c=>!q.answers.includes(c)), missing=q.answers.filter(a=>!chosen.includes(a));
+        if(!extra.length&&!missing.length){ opts.forEach(b=>{ if(q.answers.includes(b.textContent)) b.classList.add("right"); }); mark(true); }
+        else { opts.forEach(b=>{ if(extra.includes(b.textContent)) b.classList.add("wrong"); });
+          mark(false,"chose: "+chosen.join(" | "));
+          oopsMsg(extra.length?`One or more of your ticks is not right (marked in red). ${missing.length?"And there is still one to find.":""}`:`Good so far! There ${missing.length===1?"is 1 more":"are "+missing.length+" more"} to find.`); } };
+    }
+    if(q.kind==="match"){
+      const pairs={}; let sel=null; const COLORS=["#00A7B2","#FAA71C","#66A34E","#C92426","#D77F28"];
+      const Ls=[...li.querySelectorAll(".mi.L")], Rs=[...li.querySelectorAll(".mi.Rt")];
+      const paint=()=>{ Ls.concat(Rs).forEach(b=>{b.style.borderColor="";b.querySelector(".tagn").textContent="";b.classList.remove("sel");});
+        Object.entries(pairs).forEach(([l,r],n)=>{ const c=COLORS[n%COLORS.length]; const lb=Ls[+l], rb=Rs.find(x=>+x.dataset.i===r);
+          lb.style.borderColor=c; rb.style.borderColor=c; lb.querySelector(".tagn").textContent=n+1; rb.querySelector(".tagn").textContent=n+1;
+          lb.querySelector(".tagn").style.background=c; rb.querySelector(".tagn").style.background=c; });
+        if(sel!==null) Ls[sel].classList.add("sel"); };
+      Ls.forEach(b=>b.onclick=()=>{ if(it.done)return; const i2=+b.dataset.i; if(pairs[i2]!==undefined){delete pairs[i2];} sel=i2; paint(); });
+      Rs.forEach(b=>b.onclick=()=>{ if(it.done)return; const r=+b.dataset.i;
+        if(sel===null){ const owner=Object.keys(pairs).find(l=>pairs[l]===r); if(owner!==undefined){delete pairs[owner];paint();} else oopsMsg("Tap a box on the left first."); return; }
+        Object.keys(pairs).forEach(l=>{ if(pairs[l]===r) delete pairs[l]; }); pairs[sel]=r; sel=null; fb.textContent=""; paint(); });
+      li.querySelector(".clr").onclick=()=>{ if(it.done)return; Object.keys(pairs).forEach(k2=>delete pairs[k2]); sel=null; paint(); };
+      li.querySelector(".chk").onclick=()=>{ if(it.done)return;
+        if(Object.keys(pairs).length<q.left.length){ oopsMsg("Match every box on the left first."); return; }
+        const bad=Object.keys(pairs).filter(l=>pairs[l]!==+l);
+        if(!bad.length){ mark(true); }
+        else { mark(false,bad.map(l=>`${plain(q.left[l])} → ${plain(q.right[pairs[l]])}`).join(" | "));
+          bad.forEach(l=>delete pairs[l]); paint();
+          oopsMsg(`${q.left.length-bad.length} of ${q.left.length} pairs are right. The wrong pairs were cleared. Try them again.`); } };
+    }
+    if(q.kind==="order"){
+      const seq=[]; const pool=li.querySelector(".pool"), bins=[...li.querySelectorAll(".bin")];
+      const render=()=>bins.forEach((b,k)=>{ const d=b.querySelector(".drop"); if(seq[k]!==undefined) d.appendChild(li.querySelector(`.dc[data-i="${seq[k]}"]`)); });
+      li.querySelectorAll(".dc").forEach(c=>c.onclick=()=>{ if(it.done)return; const j=+c.dataset.i, at=seq.indexOf(j);
+        if(at>=0){ seq.splice(at,1); pool.appendChild(c); } else { if(seq.length>=q.answer.length) return; seq.push(j); } c.classList.remove("bad"); render(); });
+      li.querySelector(".chk").onclick=()=>{ if(it.done)return;
+        if(seq.length<q.answer.length){ oopsMsg("Place every card first."); return; }
+        const fb0=seq.findIndex((v,k)=>v!==k);
+        if(fb0<0){ li.querySelectorAll(".dc").forEach(c=>c.classList.add("good")); mark(true); }
+        else { mark(false,seq.map(j=>q.answer[j]).join(", ")); const back=seq.splice(fb0); back.forEach(j=>{ const c=li.querySelector(`.dc[data-i="${j}"]`); c.classList.add("bad"); pool.appendChild(c); }); render();
+          oopsMsg(`The first ${fb0} ${fb0===1?"card is":"cards are"} right. The rest went back. Try again!`); } };
+    }
+    if(q.kind==="drag"){
+      let picked=null; const pool=li.querySelector(".pool");
+      const cards=[...li.querySelectorAll(".dc")];
+      const place=(card,zone)=>{ if(it.done)return; (zone.classList.contains("pool")?zone:zone.querySelector(".drop")).appendChild(card); card.classList.remove("picked","bad"); picked=null; li.querySelectorAll(".bin,.pool").forEach(z=>z.classList.remove("ready")); };
+      cards.forEach(c=>{
+        c.onclick=(e)=>{ if(it.done)return; if(picked&&picked!==c){ e.stopPropagation(); place(picked,c.closest(".bin,.pool")); return; } if(picked===c){c.classList.remove("picked");picked=null;li.querySelectorAll(".bin,.pool").forEach(z=>z.classList.remove("ready"));return;}
+          cards.forEach(x=>x.classList.remove("picked")); picked=c; c.classList.add("picked"); li.querySelectorAll(".bin,.pool").forEach(z=>z.classList.add("ready")); };
+        c.addEventListener("dragstart",e=>{ picked=c; e.dataTransfer.setData("text/plain",c.dataset.i); e.dataTransfer.effectAllowed="move"; });
+      });
+      li.querySelectorAll(".bin,.pool").forEach(z=>{
+        z.addEventListener("click",e=>{ if(picked&&!e.target.closest(".dc")) place(picked,z); });
+        z.addEventListener("dragover",e=>{e.preventDefault();z.classList.add("over");});
+        z.addEventListener("dragleave",()=>z.classList.remove("over"));
+        z.addEventListener("drop",e=>{e.preventDefault();z.classList.remove("over"); const c=cards[+e.dataTransfer.getData("text/plain")]; if(c) place(c,z); });
+      });
+      li.querySelector(".chk").onclick=()=>{ if(it.done)return;
+        if(pool.querySelectorAll(".dc").length){ oopsMsg("Put every card into a box first."); return; }
+        const bad=cards.filter(c=>c.closest(".bin").dataset.bin!==q.items[+c.dataset.i].bin);
+        if(!bad.length){ cards.forEach(c=>c.classList.add("good")); mark(true); }
+        else { mark(false,bad.map(c=>`${c.textContent} → ${c.closest(".bin").dataset.bin}`).join(" | "));
+          bad.forEach(c=>{ pool.appendChild(c); c.classList.add("bad"); });
+          oopsMsg(`${cards.length-bad.length} of ${cards.length} cards are right. The others went back to the top. Try again!`); } };
+    }
+  });
+  update(); }
+
+function update(){
+  const st=DATA[cur]; if(!st) return; const items=st.items;
+  const ok=items.filter(s=>s.done).length, first=items.filter(s=>s.first===true).length;
+  $("score").textContent=`Correct: ${ok} / ${items.length} · First try: ${first}`;
+  $("progBar").style.width=(ok/items.length*100)+"%";
+  const d=SEC[cur].querySelector(".done");
+  if(ok===items.length){ if(!st.finished) st.finished=Date.now(); const stars=first>=14?3:first>=11?2:1;
+    d.innerHTML=`<h2>${"⭐".repeat(stars)} Set ${SETS[cur].id} complete!</h2><p>You got <b>${first}</b> of 15 right on the first try. Tap <b>📋 Copy report for my teacher</b> to share how you did.</p>`;
+    d.className="done show"; }
+  else d.className="done";
+}
+
+/* ===== teacher report ===== */
+function correctText(q){ if(q.kind==="order") return q.answer.join(", "); if(q.kind==="type") return q.show||fmt(q.answer); if(q.kind==="mc") return q.answer;
+  if(q.kind==="multi") return q.answers.join(" | "); if(q.kind==="match") return q.left.map((l,i)=>`${plain(l)} → ${plain(q.right[i])}`).join(" | ");
+  return q.items.map(x=>`${x.label} → ${x.bin}`).join(" | "); }
+function buildReport(){
+  const S=SETS[cur], st=DATA[cur], items=st.items, n=items.length;
+  const name=$("stuName").value.trim()||"(name not entered)";
+  const ok=items.filter(s=>s.done).length, first=items.filter(s=>s.first===true).length;
+  const tried=items.filter(s=>s.first!==null).length, pct=Math.round(first/n*100);
+  const mins=Math.max(1,Math.round(((st.finished||Date.now())-st.started)/60000));
+  const stars=first>=14?3:first>=11?2:1;
+  const group=key=>{const g={}; items.forEach(it=>{const t=key(it); g[t]=g[t]||{n:0,f:0}; g[t].n++; if(it.first===true) g[t].f++;}); return g;};
+  const tags=group(it=>it.q.tag||"Other"), kinds=group(it=>KIND_NAME[it.q.kind]);
+  const lines=g=>Object.entries(g).map(([t,v])=>`  • ${t}: ${v.f}/${v.n} first try${v.f===v.n?" ✓":""}`);
+  const weak=Object.entries(tags).filter(([t,v])=>v.f<v.n).sort((a,b)=>(a[1].f/a[1].n)-(b[1].f/b[1].n)).map(([t])=>t);
+  const help=items.map((it,k)=>({it,k})).filter(x=>x.it.wrong.length);
+  const helpLines=help.length?help.map(({it,k})=>{const q=it.q;
+      let qt=plain(q.text); if(q.pic) qt+=" (number line)";
+      return `  • Q${k+1} [${KIND_NAME[q.kind]}]: ${qt.length>90?qt.slice(0,88)+"…":qt}\n    First answer: ${it.wrong[0]}\n    Correct: ${correctText(q)}${it.done?"":" (not solved yet)"}`;}).join("\n"):"  • None. Every answer was right the first time!";
+  const todo=items.map((it,k)=>it.first===null?"Q"+(k+1):null).filter(Boolean);
+  const hints=items.filter(it=>it.hint).length;
+  let next;
+  if(tried<n) next=`Finish the remaining ${n-tried} question${n-tried>1?"s":""}, then copy the report again.`;
+  else if(pct>=90) next="Secure. Ready to move on.";
+  else if(pct>=70) next=`Nearly there. Review: ${weak.slice(0,2).join(", ")}.`;
+  else next=`Needs support. Revisit with the mentor: ${weak.slice(0,2).join(", ")}.`;
+  const date=new Date().toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
+  return [
+    "MyMasteryLab · "+DOCK_NAME,SESSION_LINE,
+    `Student: ${name}`,`Date: ${date}`,`Set ${S.id}: ${S.name}`,"",
+    `Score: ${ok}/${n} correct · ${first}/${n} first try (${pct}%) ${"⭐".repeat(stars)}`,
+    `Answered: ${tried}/${n} · Time: about ${mins} min · Hints used: ${hints}`,"",
+    "By skill:",...lines(tags),"",
+    "By question type:",...lines(kinds),"",
+    "Needed more than one try:",helpLines,
+    ...(todo.length?["","Not answered yet: "+todo.join(", ")]:[]),"",
+    `Next step: ${next}`
+  ].join("\n");
+}
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200);}
+$("copyBtn").onclick=async()=>{
+  const text=buildReport(); const box=$("reportBox"), ta=$("reportText");
+  ta.value=text; box.classList.add("show");
+  let copied=false;
+  try{ if(navigator.clipboard&&window.isSecureContext){ await navigator.clipboard.writeText(text); copied=true; } }catch(e){}
+  if(!copied){ try{ ta.focus(); ta.select(); copied=document.execCommand("copy"); }catch(e){} }
+  $("reportMsg").textContent=copied?"Copied! Paste it into the chat or email to your teacher.":"Select all the text below and copy it to share with your teacher.";
+  toast(copied?"Report copied ✓":"Select the text to copy it");
+  box.scrollIntoView({behavior:"smooth",block:"nearest"});
+};
+$("newQ").onclick=()=>{ $("reportBox").classList.remove("show"); build(cur); };
+const start=SETS.findIndex(s=>"#set-"+s.id.toLowerCase()===location.hash);
+open(start>=0?start:0);
+window.addEventListener("hashchange",()=>{const k=SETS.findIndex(s=>"#set-"+s.id.toLowerCase()===location.hash); if(k>=0&&k!==cur) open(k);});
+})();
+</script>
+</body>
+</html>

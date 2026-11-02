@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Echo’s Practice Dock · Session 1 online worksheets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#00A7B2; --teal2:#42bcb8; --teal3:#00928e; --tealSoft:#E3F6F7; --tealMist:#F3FBFB;
+  --orange:#FAA71C; --burnt:#D77F28; --crimson:#C92426; --emerald:#047857; --leaf:#66A34E;
+  --ink:#151515; --muted:#44585a; --bg:#FFFFFF;
+  color-scheme: light; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 90px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:18px;line-height:1.45}
+h1,h2,h3,.disp{font-family:"Fredoka","Nunito",system-ui,sans-serif;font-weight:600}
+button,input{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible{outline:4px solid var(--orange);outline-offset:2px}
+
+.hero{max-width:1000px;margin:0 auto;padding:18px 18px 4px;display:flex;gap:16px;align-items:center}
+.hero svg{flex:0 0 96px}
+.hero h1{margin:0;color:var(--teal3);font-size:clamp(28px,4.4vw,40px);line-height:1.1}
+.hero p{margin:4px 0 0;color:var(--muted)}
+
+.tabs{position:sticky;top:0;z-index:5;background:#fff;border-bottom:3px solid var(--tealSoft)}
+.tabs::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:#fff;z-index:10}
+.tabs .in{max-width:1000px;margin:0 auto;padding:10px 18px;display:flex;gap:8px;overflow-x:auto}
+.tab{flex:0 0 auto;border:3px solid var(--tealSoft);background:#fff;border-radius:18px;padding:8px 14px;font-weight:800;color:var(--muted);text-align:left}
+.tab small{display:block;font-weight:700;font-size:13px}
+.tab[aria-selected="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
+
+main{max-width:1000px;margin:0 auto;padding:16px 18px 40px}
+.intro{display:flex;gap:14px;align-items:flex-start;background:#FFF6E3;border:2px solid #FDE2AE;border-radius:22px;padding:12px 16px;margin-bottom:16px}
+.intro svg{flex:0 0 58px}
+.intro b.who{display:block;font-family:Fredoka,sans-serif;color:var(--burnt)}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 16px}
+.ctl{border:3px solid var(--tealSoft);background:#fff;border-radius:999px;padding:8px 16px;font-weight:800;color:var(--teal3)}
+.ctl.main{background:var(--orange);border-color:var(--orange);color:#3b2200}
+.score{margin-left:auto;font-weight:800;color:var(--muted)}
+.prog{height:12px;border-radius:999px;background:var(--tealSoft);overflow:hidden;margin:0 0 18px}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--leaf));transition:width .4s}
+
+ol.qs{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.card{border:3px solid var(--tealSoft);border-radius:22px;padding:14px 16px 16px;background:#fff;display:grid;grid-template-columns:44px 1fr;gap:12px}
+.card.ok{border-color:#bfe0b2;background:#F7FBF5}
+.card.no{border-color:#FDE2AE}
+.num{width:40px;height:40px;border-radius:14px;background:var(--teal);color:#fff;display:grid;place-items:center;font-family:Fredoka,sans-serif;font-size:20px}
+.card.ok .num{background:var(--leaf)}
+.qt{font-weight:800;font-size:19px;margin:6px 0 10px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ans{width:150px;border:3px solid var(--tealSoft);border-radius:14px;padding:8px 12px;font-size:20px;font-weight:800}
+.pm{border:3px solid var(--tealSoft);background:var(--tealMist);border-radius:14px;padding:8px 12px;font-weight:800}
+.chk{border:0;border-radius:14px;background:var(--teal);color:#fff;font-weight:800;padding:10px 16px}
+.hintb{border:0;background:none;color:var(--burnt);font-weight:800;text-decoration:underline;padding:6px}
+.opts{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.opt{border:3px solid var(--tealSoft);background:#fff;border-radius:16px;padding:10px 12px;font-weight:800;text-align:left}
+.opt:hover{background:var(--tealMist)}
+.opt.right{background:#E8F4E3;border-color:var(--leaf)}
+.opt.wrong{background:#FDEEEE;border-color:var(--crimson)}
+.fb{margin-top:8px;font-weight:700}
+.fb.good{color:var(--emerald)} .fb.oops{color:#8a4b0f}
+.hint{margin-top:6px;color:var(--muted);display:none}
+.hint.show{display:block}
+.pic{margin:4px 0 8px}
+.pic svg{width:190px;height:auto;border:2px solid var(--tealSoft);border-radius:14px;background:#fff}
+.done{margin-top:20px;text-align:center;border:3px solid var(--orange);border-radius:22px;padding:16px;background:#FFF6E3;display:none}
+.done.show{display:block}
+.done h2{margin:0;color:var(--burnt)}
+@media (max-width:560px){.card{grid-template-columns:1fr}.num{width:36px;height:36px}}
+@media (prefers-reduced-motion:reduce){.prog i{transition:none}}
+
+.name{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--muted)}
+.name input{border:3px solid var(--tealSoft);border-radius:999px;padding:7px 14px;font-weight:800;width:190px}
+.reportBox{display:none;margin:0 0 18px;border:3px solid var(--teal);border-radius:22px;padding:14px 16px;background:var(--tealMist)}
+.reportBox.show{display:block}
+.reportBox h3{margin:0 0 6px;color:var(--teal3);font-size:20px}
+.reportBox p{margin:0 0 8px;color:var(--muted);font-size:16px}
+.reportBox textarea{width:100%;min-height:280px;border:2px solid var(--tealSoft);border-radius:14px;padding:12px;font:600 15px/1.45 "Nunito",system-ui,sans-serif;color:var(--ink);background:#fff;resize:vertical}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(30px);opacity:0;
+  background:var(--emerald);color:#fff;font-weight:800;padding:12px 20px;border-radius:999px;transition:all .3s;z-index:30;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.setSec[hidden]{display:none}
+.kind{display:inline-block;font-size:13px;font-weight:800;border-radius:999px;padding:2px 10px;margin-top:4px;background:var(--tealMist);color:var(--teal3);border:2px solid var(--tealSoft)}
+.k-multi{background:#FFF6E3;color:#8a4b0f;border-color:#FDE2AE}
+.k-match{background:#EEF6EA;color:var(--emerald);border-color:#cfe6c6}
+.k-drag{background:#FDEEEE;color:var(--crimson);border-color:#F5C9C9}
+.blank{display:inline-block;min-width:54px;border-bottom:3px solid var(--orange);color:transparent}
+.how{margin:0 0 8px;color:var(--muted);font-size:15px;font-weight:700}
+.opt.tick{display:flex;align-items:center;gap:10px}
+.opt.tick .box{flex:0 0 22px;width:22px;height:22px;border-radius:7px;border:3px solid var(--teal2);background:#fff}
+.opt.tick[aria-pressed="true"]{background:var(--tealMist);border-color:var(--teal)}
+.opt.tick[aria-pressed="true"] .box{background:var(--teal);box-shadow:inset 0 0 0 3px #fff}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:8px}
+.match .col{display:flex;flex-direction:column;gap:8px}
+.mi{position:relative;border:3px solid var(--tealSoft);background:#fff;border-radius:16px;padding:10px 40px 10px 12px;font-weight:800;text-align:left;min-height:48px}
+.mi.L{background:var(--tealMist)}
+.mi.sel{border-color:var(--orange)!important;box-shadow:0 0 0 3px #FDE2AE}
+.mi .tagn{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;color:#fff;font-size:13px;display:grid;place-items:center}
+.mi .tagn:empty{display:none}
+.pool{display:flex;flex-wrap:wrap;gap:8px;min-height:56px;padding:10px;border:3px dashed var(--tealSoft);border-radius:16px;margin-bottom:10px}
+.bins{display:grid;gap:10px;margin-bottom:8px}
+.bin{border:3px solid var(--tealSoft);border-radius:16px;padding:8px;min-height:110px;background:var(--tealMist)}
+.bin > b{display:block;font-family:Fredoka,sans-serif;font-weight:700;font-size:22px;text-align:center;margin-bottom:6px;color:var(--teal3)}
+.bin .drop{display:flex;flex-direction:column;gap:6px}
+.pool.ready,.bin.ready{border-color:var(--orange)}
+.pool.over,.bin.over{background:#FFF6E3}
+.dc{border:2px solid var(--teal2);background:#fff;border-radius:12px;padding:8px 10px;font-weight:800;font-size:15px;text-align:left;cursor:grab}
+.dc.picked{outline:3px solid var(--orange);background:#FFF6E3}
+.dc.bad{border-color:var(--crimson);background:var(--crimsonSoft,#FDEEEE)}
+.dc.good{border-color:var(--leaf);background:#E8F4E3}
+.clr{border:3px solid var(--tealSoft);background:#fff;border-radius:14px;padding:8px 14px;font-weight:800;color:var(--muted)}
+@media (max-width:560px){.match{gap:8px}.bins{grid-template-columns:1fr!important}}
+
+</style>
+</head>
+<body>
+<header class="hero">
+  <svg viewBox="0 0 96 70" aria-hidden="true"><ellipse cx="48" cy="40" rx="42" ry="22" fill="#00A7B2"/><rect x="36" y="8" width="22" height="16" rx="6" fill="#00928e"/><circle cx="60" cy="40" r="12" fill="#fff" stroke="#FAA71C" stroke-width="4"/><circle cx="63" cy="40" r="5" fill="#151515"/><circle cx="30" cy="40" r="5" fill="#fff"/><circle cx="16" cy="40" r="4" fill="#fff"/></svg>
+  <div><h1>Echo’s Practice Dock</h1><p>Four practice sets with 15 fresh questions each time: fill in, choose one, choose all, match and drag and drop.</p></div>
+</header>
+<nav class="tabs" aria-label="Practice sets"><div class="in" role="tablist" id="tabs"></div></nav>
+<main>
+  <div class="intro" id="intro"></div>
+  <div class="bar">
+    <label class="name">Your name <input id="stuName" type="text" autocomplete="off" placeholder="Type your name"></label>
+    <button class="ctl main" id="newQ">🔄 New questions</button>
+    <button class="ctl" id="copyBtn">📋 Copy report for my teacher</button>
+    <span class="score" id="score" aria-live="polite"></span>
+  </div>
+  <section class="reportBox" id="reportBox" aria-live="polite">
+    <h3>Your report for this set</h3>
+    <p id="reportMsg">Copied! Paste it into the chat with your teacher.</p>
+    <textarea id="reportText" readonly aria-label="Performance report text"></textarea>
+  </section>
+  <div class="prog" aria-hidden="true"><i id="progBar"></i></div>
+  <div id="host"></div>
+</main>
+<div class="toast" id="toast" role="status">Report copied ✓</div>
+
+<script>
+(function(){
+"use strict";
+const M="\u2212";
+const fmt=n=>{const s=Math.abs(n).toLocaleString("en-US");return n>0?"+"+s:(n<0?M+s:"0");};
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const pick=(a,n)=>shuffle(a).slice(0,n);
+const one=a=>a[Math.floor(Math.random()*a.length)];
+const $=id=>document.getElementById(id);
+const ECHO=`<svg viewBox="0 0 58 58" aria-hidden="true"><circle cx="29" cy="29" r="28" fill="#fff"/><ellipse cx="29" cy="33" rx="24" ry="14" fill="#00A7B2"/><rect x="23" y="12" width="12" height="10" rx="4" fill="#00928e"/><circle cx="36" cy="33" r="7" fill="#fff" stroke="#FAA71C" stroke-width="3"/><circle cx="38" cy="33" r="3" fill="#151515"/></svg>`;
+
+/* ===== question makers =====
+   kinds: type (fill), mc (one answer), multi (select all), match (pair columns), drag (sort into bins) */
+const T=(text,answer,hint,why,pic,tag)=>({kind:"type",text,answer,hint,why,pic,tag});
+const C=(text,right,wrongs,hint,why,pic,tag)=>({kind:"mc",text,options:shuffle([right].concat(wrongs)),answer:right,hint,why,pic,tag});
+const MU=(text,rights,wrongs,hint,why,pic,tag)=>({kind:"multi",text,options:shuffle(rights.concat(wrongs)),answers:rights,hint,why,pic,tag});
+const MA=(text,pairs,hint,why,pic,tag)=>({kind:"match",text,left:pairs.map(p=>p[0]),right:pairs.map(p=>p[1]),hint,why,pic,tag});
+const DR=(text,bins,items,hint,why,pic,tag)=>({kind:"drag",text,bins,items:shuffle(items),hint,why,pic,tag});
+const KIND_NAME={type:"Fill in the blank",mc:"Multiple choice (one answer)",multi:"Multiple choice (more than one answer)",match:"Match the columns",drag:"Drag and drop"};
+
+/* ---------- shared story pools ---------- */
+const POS=[
+ n=>[`A seagull flies ${n} m above sea level.`,n],
+ n=>[`Mira earns $${n} for helping on the boat.`,n],
+ n=>[`The temperature rises by ${n} degrees.`,n],
+ n=>[`Echo gains ${n} points in a game.`,n],
+ n=>[`The lift goes up ${n} floors.`,n],
+ n=>[`Mira puts $${n} into her bank account.`,n],
+ n=>[`A kite flies ${n} m above the beach.`,n],
+ n=>[`The water in a tank goes up by ${n} cm.`,n]
+];
+const NEG=[
+ n=>[`A shark swims ${n} m below sea level.`,-n],
+ n=>[`Mira spends $${n} on fish food.`,-n],
+ n=>[`It is ${n} degrees below zero.`,-n],
+ n=>[`Echo loses ${n} points.`,-n],
+ n=>[`The lift goes to ${n} floors below the ground floor.`,-n],
+ n=>[`Mira owes her brother $${n}.`,-n],
+ n=>[`A diver is ${n} m under the water.`,-n],
+ n=>[`The temperature drops by ${n} degrees.`,-n],
+ n=>[`Mira takes $${n} out of her bank account.`,-n]
+];
+const ZERO=[
+ ["Echo floats right at sea level.","Sea level is the starting point, so it is 0."],
+ ["The temperature is exactly 0 °C.","0 °C is zero."],
+ ["Echo’s score did not change at all.","No change is 0."],
+ ["The lift is waiting at the ground floor.","The ground floor is floor 0."],
+ ["Mira has no money and owes nothing.","Nothing saved and nothing owed is $0."]
+];
+const story=(pool,lo,hi)=>{const f=one(pool);return f(R(lo,hi));};
+
+/* ---------- SET A: write the number ---------- */
+function setA(){
+  const qs=[], P="Plus (+) situations", N="Minus ("+M+") situations", Z="Zero situations";
+  // 7 fill in the blank
+  pick(POS,2).forEach(f=>{const [t,a]=f(R(2,60)); qs.push(T(t+" Write it as a number: ____",a,"Above, up or more is positive.",`It is ${fmt(a)}.`,null,P));});
+  pick(NEG,2).forEach(f=>{const [t,a]=f(R(2,60)); qs.push(T(t+" Write it as a number: ____",a,"Below, down or less is negative.",`It is ${fmt(a)}.`,null,N));});
+  {const [t,w]=one(ZERO); qs.push(T(t+" Write it as a number: ____",0,"Is there any up or down? Is it at the start?",w,null,Z));}
+  {const d=R(1,9)+0.5; qs.push(T(`On a cold night it is ${d} degrees below zero. The temperature is ____ °C.`,-d,"Decimals can be negative too.",`It is ${M}${d} °C.`,null,"Decimals"));}
+  {const big=one([[`The deepest part of the ocean is about 11,000 m below sea level.`,-11000],[`The top of a very tall mountain is 8,849 m above sea level.`,8849],[`A plane flies 9,000 m above sea level.`,9000],[`A deep-sea robot dives to 4,000 m below sea level.`,-4000]]);
+   qs.push(T(big[0]+" Write it as a number: ____",big[1],"Big numbers follow the same rule: above is +, below is "+M+".",`It is ${fmt(big[1])}.`,null,"Big numbers"));}
+  // 2 multiple choice
+  for(let k=0;k<2;k++){ const neg=k===0; const [t,a]=story(neg?NEG:POS,2,40);
+    qs.push(C(`Which number shows this? “${t}”`,fmt(a),[fmt(-a),"0",fmt(neg?a*10:a*10)],"Find the clue word first.",`It is ${fmt(a)}.`,null,neg?N:P)); }
+  // 2 multi-select
+  {const negs=pick(NEG,R(2,3)).map(f=>f(R(2,30))[0]), others=pick(POS,2).map(f=>f(R(2,30))[0]).concat([one(ZERO)[0]]);
+   qs.push(MU("Select ALL the stories that need a minus ("+M+") sign.",negs,others,"Look for down, below, less, spend, owe, lose.","Minus stories go down or take away.",null,N));}
+  {const zs=pick(ZERO,2).map(z=>z[0]), others=[story(POS,2,20)[0]].concat(pick(NEG,2).map(f=>f(R(2,20))[0]));
+   qs.push(MU("Select ALL the stories where the number is 0.",zs,others,"Zero means no change, or exactly at the start.","These stories are at the starting point.",null,Z));}
+  // 2 match
+  for(let k=0;k<2;k++){ const n=R(3,15), m=n+R(1,6);
+    const pairs=shuffle([[story(NEG,n,n)[0],fmt(-n)],[story(POS,n,n)[0],fmt(n)],[one(ZERO)[0],"0"],[story(NEG,m,m)[0],fmt(-m)]]);
+    qs.push(MA("Match each story to its number.",pairs,"Same number, different signs! Read the clue words carefully.","Each story has one number.",null,"Matching stories and numbers")); }
+  // 2 drag and drop
+  for(let k=0;k<2;k++){
+    const items=pick(POS,2).map(f=>({label:f(R(2,30))[0],bin:"+"})).concat(pick(NEG,2).map(f=>({label:f(R(2,30))[0],bin:M})),[{label:one(ZERO)[0],bin:"0"}]);
+    qs.push(DR("Drag each story into the right box.",["+",M,"0"],items,"Up or more → +. Down or less → "+M+". No change or at the start → 0.","Every story is sorted.",null,"Sorting + / "+M+" / 0")); }
+  return shuffle(qs);
+}
+
+/* ---------- SET B: what does zero mean? ---------- */
+const B_POOL=[
+ ["We measure how high or deep things are from the sea. What does 0 m mean?","Sea level",["The bottom of the ocean","The top of a mountain","There is no water"]],
+ ["We measure temperature in °C. What does 0 °C mean?","Water starts to freeze",["There is no temperature","It is very hot","The thermometer is broken"]],
+ ["In a money box, + is money saved and "+M+" is money owed. What does $0 mean?","No money saved and none owed",["You owe a lot","You are rich","The box is lost"]],
+ ["In a lift, + is floors up and "+M+" is floors down. What does floor 0 mean?","The ground floor",["The top floor","The roof","The basement"]],
+ ["On a calendar, +2 means 2 days from now and "+M+"3 means 3 days ago. What does 0 mean?","Today",["Yesterday","Tomorrow","Last week"]],
+ ["In a game, + is points won and "+M+" is points lost. What does 0 mean?","No points won or lost",["You lost the game","You won the game","The game is over"]],
+ ["On a path, + is steps forward and "+M+" is steps backward. What does 0 mean?","The starting spot",["The finish line","Very far away","The last step"]],
+ ["A hot-air balloon: + goes up, "+M+" comes down. What does a change of 0 mean?","It stays at the same height",["It goes very high","It lands","It pops"]],
+ ["A puppy’s weight: + means it gained, "+M+" means it lost. What does a change of 0 mean?","Its weight stayed the same",["It has no weight","It got very heavy","It got very light"]],
+ ["Rocket countdown: "+M+" is seconds before launch, + is seconds after. What does 0 mean?","The moment of launch",["The rocket is in space","The rocket is broken","The day before launch"]],
+ ["Water in a tank: + means it rises, "+M+" means it falls. What does a change of 0 mean?","The water level does not change",["The tank is empty","The tank is full","The water is cold"]],
+ ["Echo’s battery: + means charging, "+M+" means using power. What does 0 mean?","Not charging and not using power",["The battery is full","The battery is broken","Echo is very fast"]]
+];
+const B_EDGE=[
+ ["Which number is neither positive nor negative?","0",["1",M+"1","100"]],
+ ["Is 0 a positive number?","No. 0 is not positive and not negative.",["Yes, it is positive","No, it is negative","Yes, it is the biggest number"]],
+ ["Sea level is 0 m. A cave is below sea level. Its height must be…","a negative number",["a positive number","zero","bigger than 0"]],
+ ["Mira says 0 °C means “no temperature at all”. Is she right?","No. 0 °C is a real temperature where water freezes.",["Yes, 0 means nothing","Yes, it is too cold to measure","No, 0 °C is very hot"]]
+];
+const B_SHORT=[["Height at sea","Sea level"],["Temperature in °C","Water freezes"],["Money box","Nothing saved, nothing owed"],["Lift","Ground floor"],["Calendar","Today"],["Game points","No points won or lost"],["Path steps","The starting spot"],["Rocket countdown","The moment of launch"],["Echo’s battery","Not charging, not using power"],["Test target","Exactly on the target"]];
+function setB(){
+  const H="Zero is always the starting point. Where do we start before going up or down?";
+  const qs=[];
+  pick(B_POOL,5).forEach(([t,r,w])=>qs.push(C(t,r,w,H,`Answer: ${r}.`,null,"What 0 means in a story")));
+  pick(B_EDGE,2).forEach(([t,r,w])=>qs.push(C(t,r,w,H,`Answer: ${r}.`,null,"Zero is not + or "+M)));
+  for(let k=0;k<3;k++) qs.push(MA("Match each story to what 0 means.",pick(B_SHORT,4),H,"Each story has its own zero.",null,"What 0 means in a story"));
+  qs.push(MU("Select ALL the true sentences about 0.",pick(["0 is not positive.","0 is not negative.","0 is the starting point.","0 has no sign."],2),pick(["0 is a negative number.","0 always means “nothing at all”.","0 is bigger than every number."],2),"Zero sits in the middle, between + and "+M+".","Zero is the starting point with no sign.",null,"Zero is not + or "+M));
+  qs.push(MU("Which of these can 0 mean? Select ALL that are true.",pick(["Sea level","Water freezing (in °C)","Today, on a calendar","The ground floor"],R(2,3)),pick(["The top of a mountain","Owing lots of money","The last day of the year"],2),H,"These are all starting points.",null,"What 0 means in a story"));
+  qs.push(DR("Drag each sentence into True or False.",["True","False"],
+    shuffle([{label:"0 is not positive and not negative.",bin:"True"},{label:"0 °C means there is no temperature.",bin:"False"},{label:"Sea level is 0 m.",bin:"True"},{label:"0 is a negative number.",bin:"False"},{label:"“No change” is written as 0.",bin:"True"},{label:"The ground floor is floor "+M+"1.",bin:"False"}]).slice(0,5),
+    H,"All sorted!",null,"Zero is not + or "+M));
+  const F=[["The lift is at the ground floor. Floor number: ____",0],["On a calendar, today is day ____",0],["Water starts to freeze at ____ °C.",0],["Echo is right at sea level. Height: ____ m",0],["The score did not change. Change: ____ points",0]];
+  pick(F,2).forEach(([t,a])=>qs.push(T(t,a,H,"That is 0, the starting point.",null,"Zero in real life")));
+  return shuffle(qs);
+}
+
+/* ---------- SET C: read the depth line ---------- */
+function lineSVG(vals,labelEvery,marks){
+  const n=vals.length, top=24, bot=286, gap=(bot-top)/(n-1), x=86;
+  let s=`<svg viewBox="0 0 190 310" role="img" aria-label="Vertical number line">`;
+  const zi=vals.indexOf(0), zy=top+zi*gap;
+  s+=`<rect x="0" y="0" width="190" height="${zy}" fill="#F3FBFB"/><rect x="0" y="${zy}" width="190" height="${310-zy}" fill="#CFEFF0"/>`;
+  s+=`<line x1="${x}" y1="${top-12}" x2="${x}" y2="${bot+12}" stroke="#151515" stroke-width="3"/>`;
+  s+=`<path d="M${x} ${top-20} l-7 12 h14z M${x} ${bot+20} l-7 -12 h14z" fill="#151515"/>`;
+  vals.forEach((v,i)=>{const y=top+i*gap;
+    s+=`<line x1="${x-10}" y1="${y}" x2="${x+10}" y2="${y}" stroke="#151515" stroke-width="2"/>`;
+    if(v===0||i%labelEvery===zi%labelEvery) s+=`<text x="${x-16}" y="${y+6}" text-anchor="end" font-family="Fredoka,Nunito,sans-serif" font-size="16" font-weight="600" fill="${v>0?'#00928e':v<0?'#C92426':'#151515'}">${fmt(v)}</text>`;});
+  marks.forEach(([i,label])=>{const y=top+i*gap;
+    s+=`<circle cx="${x}" cy="${y}" r="8" fill="#FAA71C" stroke="#151515" stroke-width="2"/>`;
+    s+=`<text x="${x+20}" y="${y+6}" font-family="Fredoka,Nunito,sans-serif" font-size="17" font-weight="700" fill="#151515">${label}</text>`;});
+  return s+"</svg>";
+}
+function makeLine(){ const step=one([1,1,2,2,5,10]), half=one([4,5]); const vals=[]; for(let k=half;k>=-half;k--) vals.push(k*step); return {vals,step,labelEvery:Math.random()<.45?2:1}; }
+function setC(){
+  const qs=[]; const L4="ABCDE".split("");
+  ["zero","top","bottom","unlabelled","any","any"].forEach(f=>{
+    const L=makeLine(); let idx;
+    if(f==="zero") idx=L.vals.indexOf(0);
+    else if(f==="top") idx=0;
+    else if(f==="bottom") idx=L.vals.length-1;
+    else if(f==="unlabelled"){ L.labelEvery=2; const zi=L.vals.indexOf(0); idx=one(L.vals.map((v,i)=>i).filter(i=>i%2!==zi%2)); }
+    else { do{idx=R(0,L.vals.length-1);}while(L.vals[idx]===0); }
+    const v=L.vals[idx];
+    qs.push(T(`Echo is at the orange dot. Echo’s height or depth is ____`,v,`Start at 0. Each tick is worth ${L.step}. Count the ticks ${v>=0?"up":"down"} from 0.`,`The dot is at ${fmt(v)}.`,lineSVG(L.vals,L.labelEvery,[[idx,"Echo"]]),
+      f==="unlabelled"?"Unlabelled ticks":(v===0?"Zero on the line":"Reading a marked point")));
+  });
+  for(let q=0;q<3;q++){
+    const L=makeLine(); const ids=pick(L.vals.map((v,i)=>i),4); const letters=L4.slice(0,4);
+    const target=one(ids); const v=L.vals[target]; const right=letters[ids.indexOf(target)];
+    qs.push(C(`Which letter shows ${fmt(v)}?`,right,letters.filter(x=>x!==right),`Find 0 first. ${v>0?"Positive numbers are above 0.":v<0?"Negative numbers are below 0.":"Zero is the starting line."}`,`Letter ${right} is at ${fmt(v)}.`,lineSVG(L.vals,L.labelEvery,ids.map((id,k)=>[id,letters[k]])),"Finding a number on the line"));
+  }
+  [["below","negative"],["above","positive"]].forEach(([w,word])=>{
+    let L,ids,vals;
+    do{ L=makeLine(); ids=pick(L.vals.map((v,i)=>i),5); vals=ids.map(i=>L.vals[i]); }
+    while(vals.filter(v=>w==="below"?v<0:v>0).length<1||vals.filter(v=>w==="below"?v<0:v>0).length>3);
+    const rights=L4.filter((l,k)=>w==="below"?vals[k]<0:vals[k]>0), wrongs=L4.filter(l=>!rights.includes(l));
+    qs.push(MU(`Select ALL the letters that are ${w} sea level (${word} numbers).`,rights,wrongs,`${w==="below"?"Below":"Above"} the 0 line. Zero itself does not count!`,`Letters ${rights.join(", ")} are ${w} 0.`,lineSVG(L.vals,L.labelEvery,ids.map((id,k)=>[id,L4[k]])),"Above or below zero"));
+  });
+  for(let q=0;q<2;q++){
+    const L=makeLine(); const ids=pick(L.vals.map((v,i)=>i),4).sort((a,b)=>a-b); const letters=L4.slice(0,4);
+    qs.push(MA("Match each letter to its number.",ids.map((id,k)=>[`Letter ${letters[k]}`,fmt(L.vals[id])]),"Count the ticks from 0 for each letter.","Each letter has one number.",lineSVG(L.vals,L.labelEvery,ids.map((id,k)=>[id,letters[k]])),"Finding a number on the line"));
+  }
+  for(let q=0;q<2;q++){
+    const items=[{v:R(1,20)},{v:-R(1,20)},{v:-R(21,90)},{v:0},{v:R(21,90)},{v:-(R(1,9)+0.5)}].map(o=>({label:fmt(o.v)+" m",bin:o.v>0?"Above sea level":o.v<0?"Below sea level":"At sea level"}));
+    qs.push(DR("Drag each height to the right place.",["Above sea level","At sea level","Below sea level"],pick(items,5),"Positive is above, negative is below, 0 is at sea level.","All in the right place!",null,"Above or below zero"));
+  }
+  return shuffle(qs);
+}
+
+/* ---------- SET D: opposite moves ---------- */
+const PAIRS=[["above","below"],["up","down"],["gain","lose"],["earn","spend"],["rise","fall"],["deposit","withdraw"],["forward","backward"],["increase","decrease"],["warmer","colder"]];
+const PLUSW=["above","up","gain","earn","rise","deposit","forward","increase","warmer","save","win"];
+const MINUSW=["below","down","lose","spend","fall","withdraw","backward","decrease","colder","owe","drop"];
+const D1=[
+ n=>[`If +${n} means ${n} m up, what does ${M}${n} mean?`,`${n} m down`,[`${n} m up`,"No movement",`${2*n} m down`]],
+ n=>[`If +${n} means earning $${n}, what does ${M}${n} mean?`,`Spending $${n}`,[`Earning $${n}`,"Having $0",`Earning $${2*n}`]],
+ n=>[`If +${n} means ${n} steps forward, what does ${M}${n} mean?`,`${n} steps backward`,[`${n} steps forward`,"Standing still",`${n+1} steps backward`]],
+ n=>[`If +${n} means ${n} degrees warmer, what does ${M}${n} mean?`,`${n} degrees colder`,[`${n} degrees warmer`,"No change",`${n} degrees above zero`]],
+ n=>[`If +${n} means gaining ${n} points, what does ${M}${n} mean?`,`Losing ${n} points`,[`Gaining ${n} points`,"Getting 0 points",`Losing ${n+2} points`]],
+ n=>[`If ${M}${n} means ${n} m below sea level, what does +${n} mean?`,`${n} m above sea level`,[`${n} m below sea level`,"At sea level",`${n} m under the sand`]]
+];
+const D2=[
+ n=>[`Spending $${n} is ${M}${n}. Earning $${n} is ____`,n],
+ n=>[`Rising ${n} °C is +${n}. Dropping ${n} °C is ____`,-n],
+ n=>[`Going ${n} m above sea level is +${n}. Going ${n} m below sea level is ____`,-n],
+ n=>[`Losing ${n} points is ${M}${n}. Gaining ${n} points is ____`,n],
+ n=>[`Going up ${n} floors is +${n}. Going down ${n} floors is ____`,-n],
+ n=>[`Taking out $${n} is ${M}${n}. Putting in $${n} is ____`,n]
+];
+function setD(){
+  const qs=[];
+  pick(D1,3).forEach(f=>{const [t,r,w]=f(R(2,25)); qs.push(C(t,r,w,"The minus sign means the opposite direction.",`Answer: ${r}.`,null,"What the minus sign means"));});
+  pick(D2,3).forEach(f=>{const [t,a]=f(R(2,40)); qs.push(T(t,a,"Same number, opposite sign.",`Answer: ${fmt(a)}.`,null,"Writing the opposite"));});
+  qs.push(MU("Select ALL the minus ("+M+") words.",pick(MINUSW,3),pick(PLUSW,3),"Minus words go down or take away.","These words go down or take away.",null,"Plus and minus words"));
+  qs.push(MU("Select ALL the plus (+) words.",pick(PLUSW,R(2,3)),pick(MINUSW,3),"Plus words go up or add.","These words go up or add.",null,"Plus and minus words"));
+  for(let k=0;k<2;k++) qs.push(MA("Match each word to its opposite.",pick(PAIRS,4).map(p=>Math.random()<.5?p:[p[1],p[0]]),"Opposites go the other way.","Every word has its opposite.",null,"Opposite words"));
+  for(let k=0;k<2;k++){ const items=pick(PLUSW,3).map(w=>({label:w,bin:"Plus (+)"})).concat(pick(MINUSW,3).map(w=>({label:w,bin:"Minus ("+M+")"})));
+    qs.push(DR("Drag each word into the right box.",["Plus (+)","Minus ("+M+")"],items,"Up or more → plus. Down or less → minus.","All sorted!",null,"Plus and minus words")); }
+  { const items=[[POS,"Goes up or adds (+)"],[POS,"Goes up or adds (+)"],[NEG,"Goes down or takes away ("+M+")"],[NEG,"Goes down or takes away ("+M+")"]].map(([p,b])=>({label:story(p,2,30)[0],bin:b}));
+    qs.push(DR("Drag each move into the right box.",["Goes up or adds (+)","Goes down or takes away ("+M+")"],items,"Read the action word.","All sorted!",null,"What the minus sign means")); }
+  { const [w,o]=one(PAIRS); const flip=Math.random()<.5; const word=flip?o:w, right=flip?w:o;
+    qs.push(C(`What is the opposite of “${word}”?`,right,pick(PAIRS.filter(p=>p[0]!==w).flat(),3),"Think: which way is the other direction?",`The opposite of “${word}” is “${right}”.`,null,"Opposite words")); }
+  qs.push(one([
+    T(`Echo moves 0 m. Write the number: ____`,0,"No movement at all.","0 is not up and not down.",null,"Zero (edge case)"),
+    C(`What is the opposite of being exactly at sea level (0)?`,"Still sea level (0)",[`1 m below (${M}1)`,"1 m above (+1)","There is no answer"],"Zero is in the middle. It has no direction.","The opposite of 0 is 0.",null,"Zero (edge case)")
+  ]));
+  return shuffle(qs);
+}
+
+/* ===== sets & rendering ===== */
+const SETS=[
+ {id:"A",name:"Write the number",make:setA,intro:"Read each sea story and show it as a number. Use + for up or more, "+M+" for down or less, and 0 for the starting point. Tip: press ± to add a minus sign."},
+ {id:"B",name:"What does zero mean?",make:setB,intro:"Zero is always the starting point. Pick, match and sort what 0 means in each story."},
+ {id:"C",name:"Read the depth line",make:setC,intro:"These number lines stand up tall, like the sea. Above 0 is +, below 0 is "+M+". Some ticks have no label, so count carefully!"},
+ {id:"D",name:"Opposite moves",make:setD,intro:"Every move has an opposite. Up and down, earn and spend, gain and lose. Can you flip them?"}
+];
+let cur=0;
+const DATA=[], SEC=[];
+const tabs=$("tabs"), host=$("host");
+SETS.forEach((s,i)=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.id="tab"+i;
+  b.innerHTML=`Set ${s.id}<small>${s.name}</small>`;b.onclick=()=>open(i);tabs.appendChild(b);
+  const sec=document.createElement("section");sec.className="setSec";sec.hidden=true;
+  sec.innerHTML=`<ol class="qs"></ol><div class="done"></div>`;host.appendChild(sec);SEC.push(sec);DATA.push(null);});
+
+function norm(v){ v=String(v).replace(/[\u2212\u2013\u2014]/g,"-").replace(/[^0-9.\-+]/g,"");
+  if(!/^[+-]?\d*\.?\d+$/.test(v)) return NaN; return parseFloat(v); }
+const plain=h=>{const d=document.createElement("div");d.innerHTML=h;return d.textContent.replace(/\s+/g," ").trim();};
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const BADGE={type:"✏️ Fill in",mc:"🔘 Choose one",multi:"☑️ Choose all that fit",match:"🔗 Match",drag:"🖐️ Drag and drop"};
+
+function open(i){ cur=i; [...tabs.children].forEach((b,k)=>b.setAttribute("aria-selected",k===i));
+  SEC.forEach((s,k)=>s.hidden=k!==i);
+  $("intro").innerHTML=ECHO+`<div><b class="who">Echo says</b>${SETS[i].intro}</div>`;
+  $("reportBox").classList.remove("show");
+  if(location.hash!=="#set-"+SETS[i].id.toLowerCase()) history.replaceState(null,"","#set-"+SETS[i].id.toLowerCase());
+  if(!DATA[i]) build(i); else update(); }
+
+function questionText(q){ return q.text.replace("____",'<span class="blank">____</span>'); }
+
+function build(i){
+  const sec=SEC[i], st={started:Date.now(),finished:null,items:SETS[i].make().map(q=>({q,done:false,first:null,wrong:[]}))};
+  DATA[i]=st;
+  const ol=sec.querySelector("ol"); ol.innerHTML=""; sec.querySelector(".done").className="done";
+  st.items.forEach((it,k)=>{ const q=it.q; const li=document.createElement("li"); li.className="card"; li.dataset.kind=q.kind;
+    let body=`<div class="num">${k+1}</div><div><span class="kind k-${q.kind}">${BADGE[q.kind]}</span><p class="qt">${questionText(q)}</p>${q.pic?`<div class="pic">${q.pic}</div>`:""}`;
+    if(q.kind==="type") body+=`<div class="row"><button class="pm" type="button" aria-label="Add or remove a minus sign">±</button><input class="ans" type="text" inputmode="decimal" autocomplete="off" aria-label="Your answer for question ${k+1}"><button class="chk" type="button">Check</button><button class="hintb" type="button">Hint</button></div>`;
+    else if(q.kind==="mc") body+=`<div class="opts">${q.options.map(o=>`<button class="opt" type="button">${o}</button>`).join("")}</div><button class="hintb" type="button">Hint</button>`;
+    else if(q.kind==="multi") body+=`<div class="opts">${q.options.map(o=>`<button class="opt tick" type="button" aria-pressed="false"><span class="box" aria-hidden="true"></span>${o}</button>`).join("")}</div><div class="row"><button class="chk" type="button">Check</button><button class="hintb" type="button">Hint</button></div>`;
+    else if(q.kind==="match"){ const rOrder=shuffle(q.right.map((r,j)=>j));
+      body+=`<p class="how">Tap a box on the left, then its partner on the right.</p><div class="match"><div class="col">${q.left.map((l,j)=>`<button class="mi L" type="button" data-i="${j}">${l}<span class="tagn"></span></button>`).join("")}</div><div class="col">${rOrder.map(j=>`<button class="mi Rt" type="button" data-i="${j}">${q.right[j]}<span class="tagn"></span></button>`).join("")}</div></div><div class="row"><button class="chk" type="button">Check</button><button class="clr" type="button">Clear</button><button class="hintb" type="button">Hint</button></div>`; }
+    else if(q.kind==="drag"){
+      body+=`<p class="how">Drag a card into a box. Or tap a card, then tap a box.</p><div class="pool" data-bin="">${q.items.map((it2,j)=>`<button class="dc" type="button" draggable="true" data-i="${j}">${it2.label}</button>`).join("")}</div><div class="bins" style="grid-template-columns:repeat(${q.bins.length},1fr)">${q.bins.map(b=>`<div class="bin" data-bin="${esc(b)}"><b>${b}</b><div class="drop"></div></div>`).join("")}</div><div class="row"><button class="chk" type="button">Check</button><button class="hintb" type="button">Hint</button></div>`; }
+    body+=`<p class="fb" aria-live="polite"></p><p class="hint">💡 ${q.hint}</p></div>`;
+    li.innerHTML=body; ol.appendChild(li);
+    const fb=li.querySelector(".fb");
+    const lock=()=>li.querySelectorAll("button,input").forEach(x=>{ if(!x.classList.contains("hintb")) x.disabled=true; });
+    li.querySelector(".hintb").onclick=()=>{li.querySelector(".hint").classList.toggle("show"); it.hint=true;};
+    const mark=(ok,given)=>{ if(it.first===null) it.first=ok; if(ok){it.done=true;li.className="card ok";lock();fb.className="fb good";fb.textContent="✅ Correct! "+q.why;} else {li.className="card no"; it.wrong.push(given);} update(); };
+    const oopsMsg=m=>{fb.className="fb oops";fb.textContent=m;};
+
+    if(q.kind==="type"){
+      const inp=li.querySelector(".ans");
+      li.querySelector(".pm").onclick=()=>{ let v=inp.value.trim().replace(/^[+]/,""); inp.value=/^[-\u2212]/.test(v)?v.replace(/^[-\u2212]/,""):M+v; inp.focus(); };
+      const check=()=>{ if(it.done)return; const v=norm(inp.value);
+        if(isNaN(v)){ oopsMsg("Type a number first, like 7 or "+M+"7."); return; }
+        if(Math.abs(v-q.answer)<1e-9) mark(true);
+        else { mark(false,fmt(v)); oopsMsg((Math.abs(v)===Math.abs(q.answer))?"So close! The number is right but check the sign: up or down?":"Not yet. Try again or tap Hint."); } };
+      li.querySelector(".chk").onclick=check; inp.addEventListener("keydown",e=>{if(e.key==="Enter")check();});
+    }
+    if(q.kind==="mc"){
+      li.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ if(it.done)return;
+        if(b.textContent===q.answer){ b.classList.add("right"); mark(true); }
+        else { b.classList.add("wrong"); b.disabled=true; mark(false,b.textContent); oopsMsg("Not this one. Try again or tap Hint."); } });
+    }
+    if(q.kind==="multi"){
+      const opts=[...li.querySelectorAll(".opt")];
+      opts.forEach(b=>b.onclick=()=>{ if(it.done)return; b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")!=="true"); b.classList.remove("wrong"); });
+      li.querySelector(".chk").onclick=()=>{ if(it.done)return;
+        const chosen=opts.filter(b=>b.getAttribute("aria-pressed")==="true").map(b=>b.textContent);
+        if(!chosen.length){ oopsMsg("Tick at least one answer first."); return; }
+        const extra=chosen.filter(c=>!q.answers.includes(c)), missing=q.answers.filter(a=>!chosen.includes(a));
+        if(!extra.length&&!missing.length){ opts.forEach(b=>{ if(q.answers.includes(b.textContent)) b.classList.add("right"); }); mark(true); }
+        else { opts.forEach(b=>{ if(extra.includes(b.textContent)) b.classList.add("wrong"); });
+          mark(false,"chose: "+chosen.join(" | "));
+          oopsMsg(extra.length?`One or more of your ticks is not right (marked in red). ${missing.length?"And there is still one to find.":""}`:`Good so far! There ${missing.length===1?"is 1 more":"are "+missing.length+" more"} to find.`); } };
+    }
+    if(q.kind==="match"){
+      const pairs={}; let sel=null; const COLORS=["#00A7B2","#FAA71C","#66A34E","#C92426","#D77F28"];
+      const Ls=[...li.querySelectorAll(".mi.L")], Rs=[...li.querySelectorAll(".mi.Rt")];
+      const paint=()=>{ Ls.concat(Rs).forEach(b=>{b.style.borderColor="";b.querySelector(".tagn").textContent="";b.classList.remove("sel");});
+        Object.entries(pairs).forEach(([l,r],n)=>{ const c=COLORS[n%COLORS.length]; const lb=Ls[+l], rb=Rs.find(x=>+x.dataset.i===r);
+          lb.style.borderColor=c; rb.style.borderColor=c; lb.querySelector(".tagn").textContent=n+1; rb.querySelector(".tagn").textContent=n+1;
+          lb.querySelector(".tagn").style.background=c; rb.querySelector(".tagn").style.background=c; });
+        if(sel!==null) Ls[sel].classList.add("sel"); };
+      Ls.forEach(b=>b.onclick=()=>{ if(it.done)return; const i2=+b.dataset.i; if(pairs[i2]!==undefined){delete pairs[i2];} sel=i2; paint(); });
+      Rs.forEach(b=>b.onclick=()=>{ if(it.done)return; const r=+b.dataset.i;
+        if(sel===null){ const owner=Object.keys(pairs).find(l=>pairs[l]===r); if(owner!==undefined){delete pairs[owner];paint();} else oopsMsg("Tap a box on the left first."); return; }
+        Object.keys(pairs).forEach(l=>{ if(pairs[l]===r) delete pairs[l]; }); pairs[sel]=r; sel=null; fb.textContent=""; paint(); });
+      li.querySelector(".clr").onclick=()=>{ if(it.done)return; Object.keys(pairs).forEach(k2=>delete pairs[k2]); sel=null; paint(); };
+      li.querySelector(".chk").onclick=()=>{ if(it.done)return;
+        if(Object.keys(pairs).length<q.left.length){ oopsMsg("Match every box on the left first."); return; }
+        const bad=Object.keys(pairs).filter(l=>pairs[l]!==+l);
+        if(!bad.length){ mark(true); }
+        else { mark(false,bad.map(l=>`${plain(q.left[l])} → ${plain(q.right[pairs[l]])}`).join(" | "));
+          bad.forEach(l=>delete pairs[l]); paint();
+          oopsMsg(`${q.left.length-bad.length} of ${q.left.length} pairs are right. The wrong pairs were cleared. Try them again.`); } };
+    }
+    if(q.kind==="drag"){
+      let picked=null; const pool=li.querySelector(".pool");
+      const cards=[...li.querySelectorAll(".dc")];
+      const place=(card,zone)=>{ if(it.done)return; (zone.classList.contains("pool")?zone:zone.querySelector(".drop")).appendChild(card); card.classList.remove("picked","bad"); picked=null; li.querySelectorAll(".bin,.pool").forEach(z=>z.classList.remove("ready")); };
+      cards.forEach(c=>{
+        c.onclick=(e)=>{ if(it.done)return; if(picked&&picked!==c){ e.stopPropagation(); place(picked,c.closest(".bin,.pool")); return; } if(picked===c){c.classList.remove("picked");picked=null;li.querySelectorAll(".bin,.pool").forEach(z=>z.classList.remove("ready"));return;}
+          cards.forEach(x=>x.classList.remove("picked")); picked=c; c.classList.add("picked"); li.querySelectorAll(".bin,.pool").forEach(z=>z.classList.add("ready")); };
+        c.addEventListener("dragstart",e=>{ picked=c; e.dataTransfer.setData("text/plain",c.dataset.i); e.dataTransfer.effectAllowed="move"; });
+      });
+      li.querySelectorAll(".bin,.pool").forEach(z=>{
+        z.addEventListener("click",e=>{ if(picked&&!e.target.closest(".dc")) place(picked,z); });
+        z.addEventListener("dragover",e=>{e.preventDefault();z.classList.add("over");});
+        z.addEventListener("dragleave",()=>z.classList.remove("over"));
+        z.addEventListener("drop",e=>{e.preventDefault();z.classList.remove("over"); const c=cards[+e.dataTransfer.getData("text/plain")]; if(c) place(c,z); });
+      });
+      li.querySelector(".chk").onclick=()=>{ if(it.done)return;
+        if(pool.querySelectorAll(".dc").length){ oopsMsg("Put every card into a box first."); return; }
+        const bad=cards.filter(c=>c.closest(".bin").dataset.bin!==q.items[+c.dataset.i].bin);
+        if(!bad.length){ cards.forEach(c=>c.classList.add("good")); mark(true); }
+        else { mark(false,bad.map(c=>`${c.textContent} → ${c.closest(".bin").dataset.bin}`).join(" | "));
+          bad.forEach(c=>{ pool.appendChild(c); c.classList.add("bad"); });
+          oopsMsg(`${cards.length-bad.length} of ${cards.length} cards are right. The others went back to the top. Try again!`); } };
+    }
+  });
+  update(); }
+
+function update(){
+  const st=DATA[cur]; if(!st) return; const items=st.items;
+  const ok=items.filter(s=>s.done).length, first=items.filter(s=>s.first===true).length;
+  $("score").textContent=`Correct: ${ok} / ${items.length} · First try: ${first}`;
+  $("progBar").style.width=(ok/items.length*100)+"%";
+  const d=SEC[cur].querySelector(".done");
+  if(ok===items.length){ if(!st.finished) st.finished=Date.now(); const stars=first>=14?3:first>=11?2:1;
+    d.innerHTML=`<h2>${"⭐".repeat(stars)} Set ${SETS[cur].id} complete!</h2><p>You got <b>${first}</b> of 15 right on the first try. Tap <b>📋 Copy report for my teacher</b> to share how you did.</p>`;
+    d.className="done show"; }
+  else d.className="done";
+}
+
+/* ===== teacher report ===== */
+function correctText(q){ if(q.kind==="type") return fmt(q.answer); if(q.kind==="mc") return q.answer;
+  if(q.kind==="multi") return q.answers.join(" | "); if(q.kind==="match") return q.left.map((l,i)=>`${plain(l)} → ${plain(q.right[i])}`).join(" | ");
+  return q.items.map(x=>`${x.label} → ${x.bin}`).join(" | "); }
+function buildReport(){
+  const S=SETS[cur], st=DATA[cur], items=st.items, n=items.length;
+  const name=$("stuName").value.trim()||"(name not entered)";
+  const ok=items.filter(s=>s.done).length, first=items.filter(s=>s.first===true).length;
+  const tried=items.filter(s=>s.first!==null).length, pct=Math.round(first/n*100);
+  const mins=Math.max(1,Math.round(((st.finished||Date.now())-st.started)/60000));
+  const stars=first>=14?3:first>=11?2:1;
+  const group=key=>{const g={}; items.forEach(it=>{const t=key(it); g[t]=g[t]||{n:0,f:0}; g[t].n++; if(it.first===true) g[t].f++;}); return g;};
+  const tags=group(it=>it.q.tag||"Other"), kinds=group(it=>KIND_NAME[it.q.kind]);
+  const lines=g=>Object.entries(g).map(([t,v])=>`  • ${t}: ${v.f}/${v.n} first try${v.f===v.n?" ✓":""}`);
+  const weak=Object.entries(tags).filter(([t,v])=>v.f<v.n).sort((a,b)=>(a[1].f/a[1].n)-(b[1].f/b[1].n)).map(([t])=>t);
+  const help=items.map((it,k)=>({it,k})).filter(x=>x.it.wrong.length);
+  const helpLines=help.length?help.map(({it,k})=>{const q=it.q;
+      let qt=plain(q.text); if(q.pic) qt+=" (number line)";
+      return `  • Q${k+1} [${KIND_NAME[q.kind]}]: ${qt.length>90?qt.slice(0,88)+"…":qt}\n    First answer: ${it.wrong[0]}\n    Correct: ${correctText(q)}${it.done?"":" (not solved yet)"}`;}).join("\n"):"  • None. Every answer was right the first time!";
+  const todo=items.map((it,k)=>it.first===null?"Q"+(k+1):null).filter(Boolean);
+  const hints=items.filter(it=>it.hint).length;
+  let next;
+  if(tried<n) next=`Finish the remaining ${n-tried} question${n-tried>1?"s":""}, then copy the report again.`;
+  else if(pct>=90) next="Secure. Ready to move on.";
+  else if(pct>=70) next=`Nearly there. Review: ${weak.slice(0,2).join(", ")}.`;
+  else next=`Needs support. Revisit with the mentor: ${weak.slice(0,2).join(", ")}.`;
+  const date=new Date().toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
+  return [
+    "MyMasteryLab · Echo’s Practice Dock","Session 1: Plus, Minus and Zero",
+    `Student: ${name}`,`Date: ${date}`,`Set ${S.id}: ${S.name}`,"",
+    `Score: ${ok}/${n} correct · ${first}/${n} first try (${pct}%) ${"⭐".repeat(stars)}`,
+    `Answered: ${tried}/${n} · Time: about ${mins} min · Hints used: ${hints}`,"",
+    "By skill:",...lines(tags),"",
+    "By question type:",...lines(kinds),"",
+    "Needed more than one try:",helpLines,
+    ...(todo.length?["","Not answered yet: "+todo.join(", ")]:[]),"",
+    `Next step: ${next}`
+  ].join("\n");
+}
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200);}
+$("copyBtn").onclick=async()=>{
+  const text=buildReport(); const box=$("reportBox"), ta=$("reportText");
+  ta.value=text; box.classList.add("show");
+  let copied=false;
+  try{ if(navigator.clipboard&&window.isSecureContext){ await navigator.clipboard.writeText(text); copied=true; } }catch(e){}
+  if(!copied){ try{ ta.focus(); ta.select(); copied=document.execCommand("copy"); }catch(e){} }
+  $("reportMsg").textContent=copied?"Copied! Paste it into the chat or email to your teacher.":"Select all the text below and copy it to share with your teacher.";
+  toast(copied?"Report copied ✓":"Select the text to copy it");
+  box.scrollIntoView({behavior:"smooth",block:"nearest"});
+};
+$("newQ").onclick=()=>{ $("reportBox").classList.remove("show"); build(cur); };
+const start=SETS.findIndex(s=>"#set-"+s.id.toLowerCase()===location.hash);
+open(start>=0?start:0);
+window.addEventListener("hashchange",()=>{const k=SETS.findIndex(s=>"#set-"+s.id.toLowerCase()===location.hash); if(k>=0&&k!==cur) open(k);});
+})();
+</script>
+</body>
+</html>

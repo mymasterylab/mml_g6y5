@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Echo’s Deep Dive · The Broken Depth Gauge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#00A7B2; --teal2:#42bcb8; --teal3:#00928e; --tealSoft:#E3F6F7; --tealMist:#F3FBFB;
+  --orange:#FAA71C; --burnt:#D77F28; --crimson:#C92426; --emerald:#047857; --leaf:#66A34E;
+  --ink:#151515; --muted:#44585a; --bg:#FFFFFF;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:18px;line-height:1.45}
+h1,h2,h3,.disp{font-family:"Fredoka","Nunito",system-ui,sans-serif;font-weight:600;letter-spacing:.2px}
+button{font:inherit;cursor:pointer}
+button:focus-visible,[tabindex]:focus-visible{outline:4px solid var(--orange);outline-offset:3px}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  max-width:1180px;margin:0 auto;padding:16px 18px 8px}
+.title h1{margin:0;font-size:clamp(26px,4vw,38px);color:var(--teal3);line-height:1.1}
+.title p{margin:2px 0 0;color:var(--muted);font-size:16px}
+.hud{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pill{display:flex;align-items:center;gap:8px;background:var(--tealMist);border:2px solid var(--tealSoft);
+  border-radius:999px;padding:6px 14px;font-weight:800}
+.pill.stars{background:#FFF6E3;border-color:#FDE2AE;color:#8a4b0f}
+.pill .big{font-family:Fredoka,sans-serif;font-size:22px}
+.iconbtn{border:2px solid var(--tealSoft);background:#fff;border-radius:999px;padding:6px 12px;font-weight:800;color:var(--teal3)}
+
+.wrap{max-width:1180px;margin:0 auto;padding:6px 18px 28px;display:grid;
+  grid-template-columns:minmax(300px,440px) 1fr;gap:22px;align-items:start}
+@media (max-width:860px){.wrap{grid-template-columns:1fr}}
+
+.sceneBox{position:relative;border-radius:28px;overflow:hidden;border:3px solid var(--tealSoft);background:#fff}
+#scene{display:block;width:100%;height:auto;max-height:78vh}
+@media (max-width:860px){#scene{max-height:60vh}}
+.gauge{display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;border-top:3px solid var(--tealSoft);
+  padding:10px 12px;font-weight:800;color:var(--teal3)}
+.gauge b{font-family:Fredoka,sans-serif;font-size:26px;color:var(--ink)}
+.gauge.broken b{color:var(--crimson)}
+
+.panel{background:#fff;border:3px solid var(--tealSoft);border-radius:28px;padding:20px 22px 22px;min-height:420px}
+.steps{display:flex;gap:8px;margin:0 0 14px;padding:0;list-style:none;flex-wrap:wrap}
+.steps li{flex:1;min-width:110px;border-radius:14px;padding:6px 10px;font-weight:800;font-size:14px;
+  background:var(--tealMist);color:var(--muted);border:2px solid var(--tealSoft)}
+.steps li.now{background:var(--teal);color:#fff;border-color:var(--teal)}
+.steps li.done{background:#E8F4E3;color:var(--emerald);border-color:#cfe6c6}
+
+.talk{display:flex;gap:14px;align-items:flex-start;margin:6px 0 16px}
+.talk .face{flex:0 0 72px;width:72px;height:72px}
+.bubble{position:relative;background:var(--tealMist);border:2px solid var(--tealSoft);border-radius:20px;padding:12px 16px;font-size:19px}
+.bubble .who{display:block;font-family:Fredoka,sans-serif;font-weight:700;color:var(--teal3);font-size:16px}
+.talk.inky .bubble{background:#FDEEEE;border-color:#F5C9C9}
+.talk.inky .bubble .who{color:var(--crimson)}
+.talk.echo .bubble{background:#FFF6E3;border-color:#FDE2AE}
+.talk.echo .bubble .who{color:var(--burnt)}
+
+.q{font-size:22px;font-weight:800;margin:6px 0 16px;line-height:1.35}
+.q .tag{display:inline-block;background:var(--orange);color:#3b2200;border-radius:10px;padding:0 8px;margin-right:6px;font-size:16px}
+.choices{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.choice{border:3px solid var(--tealSoft);background:#fff;border-radius:20px;padding:14px 12px;font-weight:800;font-size:19px;
+  color:var(--ink);transition:transform .12s ease, background .2s ease}
+.choice:hover{transform:translateY(-2px);background:var(--tealMist)}
+.choice.plus{border-color:#9FDDE0}
+.choice.minus{border-color:#F3B9B9}
+.choice.zero{border-color:#FDE2AE}
+.choice .sym{display:block;font-family:Fredoka,sans-serif;font-size:40px;line-height:1}
+.choice.plus .sym{color:var(--teal3)} .choice.minus .sym{color:var(--crimson)} .choice.zero .sym{color:var(--burnt)}
+.choice.right{background:#E8F4E3;border-color:var(--leaf)}
+.choice.wrong{background:#FDEEEE;border-color:var(--crimson);animation:shake .35s}
+.choice[disabled]{cursor:default}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+.feedback{margin-top:16px;border-radius:18px;padding:12px 16px;font-size:18px;display:none}
+.feedback.good{display:block;background:#E8F4E3;border:2px solid #cfe6c6;color:#1f4d12}
+.feedback.oops{display:block;background:#FFF6E3;border:2px solid #FDE2AE;color:#6b3a06}
+.go{margin-top:18px;border:0;border-radius:999px;background:var(--teal);color:#fff;font-weight:800;font-size:20px;
+  padding:12px 26px;box-shadow:0 6px 0 var(--teal3);font-family:Fredoka,sans-serif}
+.go:active{transform:translateY(3px);box-shadow:0 3px 0 var(--teal3)}
+.go.orange{background:var(--orange);color:#3b2200;box-shadow:0 6px 0 var(--burnt)}
+.hint{color:var(--muted);font-size:16px;margin-top:8px}
+.counter{font-weight:800;color:var(--muted);font-size:15px}
+
+.end{text-align:center}
+.end .talk{text-align:left}
+.end h2{font-size:34px;color:var(--teal3);margin:6px 0}
+.badge{display:inline-flex;flex-direction:column;align-items:center;gap:4px;margin:10px auto;padding:14px 22px;border-radius:24px;
+  background:#FFF6E3;border:3px solid var(--orange)}
+.badge .disp{font-size:24px;color:var(--burnt)}
+.rating{font-size:34px;letter-spacing:4px}
+
+/* scene animation */
+.bob{animation:bob 2.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes bob{50%{transform:translateY(-4px)}}
+.prop{animation:spin .4s linear infinite;transform-box:fill-box;transform-origin:center}
+@keyframes spin{50%{transform:scaleY(.2)}}
+.wave{animation:wave 6s linear infinite}
+@keyframes wave{to{transform:translateX(-80px)}}
+.pop{animation:pop .5s cubic-bezier(.3,1.6,.5,1) both;transform-box:fill-box;transform-origin:center}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.bubbleDot{animation:rise 1.6s ease-out forwards}
+@keyframes rise{to{transform:translateY(-90px);opacity:0}}
+#echo,#creatures,#fx{pointer-events:none}
+.band{fill:transparent;cursor:default}
+.armed .band{cursor:pointer}
+.armed .band:hover,.armed .band:focus{fill:rgba(250,167,28,.22)}
+.blink{animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:.25}}
+.pool{display:flex;flex-wrap:wrap;gap:8px;min-height:58px;padding:10px;border:3px dashed var(--tealSoft);border-radius:18px;margin:6px 0 10px}
+.bins{display:grid;gap:10px}
+.bin{border:3px solid var(--tealSoft);border-radius:18px;padding:8px;min-height:120px;background:var(--tealMist)}
+.bin>b{display:block;text-align:center;font-family:Fredoka,sans-serif;font-size:24px;margin-bottom:6px}
+.bin>b.plus{color:var(--teal3)} .bin>b.minus{color:var(--crimson)} .bin>b.zero{color:var(--burnt)}
+.bin .drop{display:flex;flex-direction:column;gap:6px}
+.pool.ready,.bin.ready{border-color:var(--orange)} .pool.over,.bin.over{background:#FFF6E3}
+.dc{border:2px solid var(--teal2);background:#fff;border-radius:14px;padding:8px 10px;font-weight:800;font-size:16px;text-align:left;cursor:grab}
+.dc.picked{outline:3px solid var(--orange);background:#FFF6E3} .dc.bad{border-color:var(--crimson);background:#FDEEEE} .dc.good{border-color:var(--leaf);background:#E8F4E3}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 4px}
+.match .col{display:flex;flex-direction:column;gap:8px}
+.mi{position:relative;border:3px solid var(--tealSoft);background:#fff;border-radius:16px;padding:10px 38px 10px 12px;font-weight:800;font-size:16px;text-align:left;min-height:50px}
+.mi.L{background:var(--tealMist)} .mi.sel{border-color:var(--orange)!important;box-shadow:0 0 0 3px #FDE2AE}
+.mi .tagn{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;color:#fff;font-size:13px;display:grid;place-items:center}
+.mi .tagn:empty{display:none}
+.tick{display:flex;align-items:center;gap:10px;text-align:left}
+.tick .box{flex:0 0 24px;width:24px;height:24px;border-radius:8px;border:3px solid var(--teal2);background:#fff}
+.tick[aria-pressed="true"]{background:var(--tealMist);border-color:var(--teal)}
+.tick[aria-pressed="true"] .box{background:var(--teal);box-shadow:inset 0 0 0 3px #fff}
+.typeRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.typeRow input{width:150px;border:3px solid var(--tealSoft);border-radius:16px;padding:10px 14px;font:700 24px Fredoka,Nunito,sans-serif;text-align:center}
+.pm{border:3px solid var(--tealSoft);background:var(--tealMist);border-radius:16px;padding:10px 16px;font-weight:800;font-size:20px}
+.tick{font-size:17px}
+#w .choices{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.qtype{display:inline-block;font-size:14px;font-weight:800;border-radius:999px;padding:2px 10px;background:#FFF6E3;color:#8a4b0f;border:2px solid #FDE2AE;margin-bottom:4px}
+@media (max-width:560px){.bins{grid-template-columns:1fr!important}.match{gap:8px}}
+.confetti{position:fixed;top:-20px;width:12px;height:18px;border-radius:3px;z-index:20;animation:fall 2.8s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+@media (prefers-reduced-motion:reduce){
+  .bob,.prop,.wave,.blink{animation:none}
+  .pop,.bubbleDot,.confetti,.choice.wrong{animation-duration:.01s}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="title">
+    <h1>Echo’s Deep Dive</h1>
+    <p>Mission: fix the broken depth gauge</p>
+  </div>
+  <div class="hud">
+    <div class="pill stars" aria-live="polite"><span>⭐</span><span class="big" id="starCount">0</span><span>stars</span></div>
+    <button class="iconbtn" id="soundBtn" aria-pressed="true">🔊 Sound on</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="sceneBox" aria-label="Ocean scene with a vertical number line">
+    <svg id="scene" viewBox="0 0 420 580" role="img" aria-label="Sky above, sea below. Sea level is zero.">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#DDF4F5"/></linearGradient>
+        <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9FE3E5"/><stop offset=".55" stop-color="#5CC9CB"/><stop offset="1" stop-color="#21A9AD"/></linearGradient>
+      </defs>
+      <rect x="0" y="0" width="420" height="290" fill="url(#sky)"/>
+      <circle cx="360" cy="62" r="30" fill="#FAA71C" opacity=".9"/>
+      <circle cx="360" cy="62" r="42" fill="#FAA71C" opacity=".18"/>
+      <g fill="#fff" stroke="#cdeff0" stroke-width="2">
+        <path d="M150 90 q10 -22 30 -12 q14 -16 32 0 q20 -2 18 16 h-82 q-8 -2 2 -4z"/>
+        <path d="M250 150 q8 -16 24 -9 q12 -12 26 0 q14 0 12 12 h-64z"/>
+      </g>
+      <!-- distant mountain -->
+      <path d="M300 290 L345 215 L372 245 L395 205 L420 240 L420 290Z" fill="#cfeee0"/>
+      <rect x="0" y="290" width="420" height="290" fill="url(#sea)"/>
+      <g class="wave"><path d="M0 290 q20 -8 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 V300 H0Z" fill="#7fd6d9"/></g>
+      <!-- sea floor -->
+      <path d="M0 560 q60 -14 120 -2 t140 -4 t160 6 V580 H0Z" fill="#e9c98f"/>
+      <g fill="#66A34E" opacity=".85"><path d="M380 560 q-8 -30 4 -50 q-10 24 4 50z"/><path d="M394 562 q8 -36 -4 -58 q14 30 10 58z"/></g>
+
+      <!-- number line -->
+      <g id="numberLine" font-family="Fredoka, Nunito, sans-serif"></g>
+      <g id="bands"></g>
+      <g id="creatures"></g>
+      <g id="fx"></g>
+
+      <!-- Echo the submarine -->
+      <g id="echo" transform="translate(250 290)">
+        <g class="bob">
+          <rect x="-12" y="-46" width="30" height="22" rx="8" fill="#00928e"/>
+          <rect x="6" y="-62" width="6" height="18" rx="3" fill="#00928e"/>
+          <rect x="6" y="-64" width="18" height="6" rx="3" fill="#00928e"/>
+          <ellipse cx="0" cy="-8" rx="58" ry="30" fill="#00A7B2"/>
+          <ellipse cx="-6" cy="-20" rx="40" ry="10" fill="#42bcb8" opacity=".7"/>
+          <circle cx="16" cy="-8" r="15" fill="#fff" stroke="#FAA71C" stroke-width="5"/>
+          <circle id="pupil" cx="19" cy="-8" r="6" fill="#151515"/>
+          <circle cx="21" cy="-10" r="2" fill="#fff"/>
+          <circle cx="-22" cy="-6" r="6" fill="#fff" opacity=".9"/>
+          <circle cx="-40" cy="-6" r="5" fill="#fff" opacity=".9"/>
+          <path d="M4 10 q12 8 24 0" stroke="#151515" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <rect x="-66" y="-14" width="10" height="14" rx="3" fill="#D77F28"/>
+          <g class="prop"><ellipse cx="-72" cy="-7" rx="4" ry="16" fill="#FAA71C"/></g>
+        </g>
+      </g>
+    </svg>
+    <div class="gauge broken" id="gauge" aria-live="polite">Depth gauge: <b id="gaugeVal">??</b></div>
+  </section>
+
+  <section class="panel" aria-live="polite">
+    <ol class="steps" id="steps">
+      <li>1 · Plus or minus?</li>
+      <li>2 · Dive to the spot</li>
+      <li>3 · Match the zeros</li>
+      <li>4 · Inky’s mix-ups</li>
+    </ol>
+    <div id="stage"></div>
+  </section>
+</main>
+
+<script>
+(function(){
+"use strict";
+const MINUS="\u2212";
+const fmt=n=>n>0?"+"+n:(n<0?MINUS+Math.abs(n):"0");
+const yOf=d=>290-d*25;
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const pick=(a,n)=>shuffle(a).slice(0,n);
+const R=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $=id=>document.getElementById(id);
+const stage=$("stage"), scene=$("scene");
+let placed=0;
+let stars=0, maxStars=0, echoDepth=0, soundOn=true, gaugeFixed=false;
+
+/* ---------- sound ---------- */
+let ac=null;
+function tone(freqs,dur){ if(!soundOn)return; try{ ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+  freqs.forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.type="sine";o.frequency.value=f;
+   const t=ac.currentTime+i*dur;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.18,t+.02);
+   g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+dur+.02);});
+ }catch(e){} }
+const yay=()=>tone([523,659,784],.12), oops=()=>tone([300,220],.16);
+$("soundBtn").addEventListener("click",e=>{soundOn=!soundOn;e.currentTarget.setAttribute("aria-pressed",soundOn);
+  e.currentTarget.textContent=soundOn?"🔊 Sound on":"🔇 Sound off";});
+
+/* ---------- scene drawing ---------- */
+(function drawLine(){
+  const g=$("numberLine"); let s='<line x1="70" y1="40" x2="70" y2="540" stroke="#151515" stroke-width="3"/>';
+  s+='<path d="M70 26 l-8 14 h16z" fill="#151515"/><path d="M70 554 l-8 -14 h16z" fill="#151515"/>';
+  for(let d=-10;d<=10;d++){const y=yOf(d), major=d%2===0;
+    s+=`<line x1="${major?58:63}" y1="${y}" x2="${major?82:77}" y2="${y}" stroke="#151515" stroke-width="${major?2.5:1.5}"/>`;
+    if(major&&d!==0) s+=`<text x="52" y="${y+6}" text-anchor="end" font-size="17" font-weight="600" fill="${d>0?'#00928e':'#C92426'}">${fmt(d)}</text>`;
+  }
+  s+=`<rect x="8" y="${yOf(0)-15}" width="48" height="30" rx="10" fill="#FAA71C"/><text x="32" y="${yOf(0)+7}" text-anchor="middle" font-size="20" font-weight="700" fill="#3b2200">0</text>`;
+  s+=`<text x="92" y="${yOf(0)-8}" font-size="13" font-weight="700" fill="#6b3a06">sea level</text>`;
+  s+=`<text x="92" y="52" font-size="13" font-weight="700" fill="#00928e">above (+)</text><text x="92" y="532" font-size="13" font-weight="700" fill="#fff">below (${MINUS})</text>`;
+  g.innerHTML=s;
+  const b=$("bands"); let t="";
+  for(let d=10;d>=-10;d--){ t+=`<rect class="band" data-d="${d}" x="0" y="${yOf(d)-12.5}" width="420" height="25" tabindex="-1" role="button" aria-label="Go to ${d>0?d+' metres above':d<0?Math.abs(d)+' metres below':'sea level, zero'}"></rect>`;}
+  b.innerHTML=t;
+})();
+
+function setGauge(v){ const el=$("gaugeVal"); if(!gaugeFixed){el.textContent="??";return;}
+  const r=Math.round(v); el.textContent=fmt(r)+" m"; }
+function moveEcho(to,cb){ const from=echoDepth, t0=performance.now(), dur=reduce?10:900; bubbles();
+  function step(t){ let p=Math.min(1,(t-t0)/dur); p=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+    const cur=from+(to-from)*p; $("echo").setAttribute("transform",`translate(250 ${yOf(cur)})`); setGauge(cur);
+    if(p<1) requestAnimationFrame(step); else {echoDepth=to; cb&&cb();} }
+  requestAnimationFrame(step); }
+function bubbles(){ if(reduce)return; const fx=$("fx"); for(let i=0;i<7;i++){ const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+  c.setAttribute("cx",180+Math.random()*30); c.setAttribute("cy",yOf(echoDepth)+Math.random()*10); c.setAttribute("r",3+Math.random()*5);
+  c.setAttribute("fill","#fff"); c.setAttribute("opacity",".8"); c.setAttribute("class","bubbleDot"); c.style.animationDelay=(i*.08)+"s";
+  fx.appendChild(c); setTimeout(()=>c.remove(),2200);} }
+function sparkle(x,y){ const fx=$("fx"); const s=document.createElementNS("http://www.w3.org/2000/svg","g");
+  s.setAttribute("class","pop"); s.innerHTML=`<path transform="translate(${x} ${y})" d="M0 -16 L4 -4 L16 0 L4 4 L0 16 L-4 4 L-16 0 L-4 -4Z" fill="#FAA71C"/>`;
+  fx.appendChild(s); setTimeout(()=>s.remove(),1200); }
+
+const CREATURE={
+ gull:`<path d="M-22 0 q11 -14 22 0 q11 -14 22 0" stroke="#151515" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="0" cy="1" r="3" fill="#FAA71C"/>`,
+ drone:`<rect x="-14" y="-5" width="28" height="10" rx="4" fill="#D77F28"/><line x1="-20" y1="-9" x2="-6" y2="-9" stroke="#151515" stroke-width="3"/><line x1="6" y1="-9" x2="20" y2="-9" stroke="#151515" stroke-width="3"/><circle cx="0" cy="0" r="3" fill="#fff"/>`,
+ buoy:`<rect x="-10" y="-22" width="20" height="26" rx="6" fill="#C92426"/><rect x="-10" y="-13" width="20" height="7" fill="#fff"/><line x1="0" y1="-22" x2="0" y2="-34" stroke="#151515" stroke-width="3"/><circle cx="0" cy="-36" r="4" fill="#FAA71C"/>`,
+ fish:`<ellipse cx="0" cy="0" rx="18" ry="10" fill="#FAA71C"/><path d="M16 0 l12 -9 v18z" fill="#D77F28"/><circle cx="-8" cy="-2" r="3" fill="#151515"/>`,
+ puffer:`<circle r="14" fill="#FAA71C"/><g stroke="#D77F28" stroke-width="3">${[0,45,90,135,180,225,270,315].map(a=>`<line x1="0" y1="-14" x2="0" y2="-20" transform="rotate(${a})"/>`).join("")}</g><circle cx="-5" cy="-3" r="3" fill="#151515"/>`,
+ turtle:`<ellipse rx="18" ry="11" fill="#66A34E"/><path d="M-10 -4 h20 M-12 4 h24" stroke="#047857" stroke-width="2"/><circle cx="-22" cy="0" r="6" fill="#66A34E"/><circle cx="-24" cy="-1" r="1.6" fill="#151515"/>`,
+ jelly:`<path d="M-14 0 a14 14 0 0 1 28 0z" fill="#F29A9B"/><g stroke="#C92426" stroke-width="2.5" fill="none"><path d="M-8 0 q-3 8 0 16"/><path d="M0 0 q3 8 0 18"/><path d="M8 0 q-3 8 0 16"/></g>`,
+ crab:`<ellipse rx="16" ry="10" fill="#C92426"/><circle cx="-6" cy="-12" r="3" fill="#151515"/><circle cx="6" cy="-12" r="3" fill="#151515"/><path d="M-16 -2 l-10 -8 M16 -2 l10 -8" stroke="#C92426" stroke-width="4" stroke-linecap="round"/>`,
+ chest:`<rect x="-16" y="-8" width="32" height="18" rx="3" fill="#D77F28"/><rect x="-16" y="-16" width="32" height="9" rx="4" fill="#FAA71C"/><rect x="-3" y="-6" width="6" height="7" fill="#151515"/>`
+};
+function placeCreature(type,d){ const g=document.createElementNS("http://www.w3.org/2000/svg","g");
+  const x=type==="chest"?300:322+(placed++%3)*34; g.setAttribute("transform",`translate(${x} ${yOf(d)})`); g.innerHTML=`<g class="pop">${CREATURE[type]}</g>`; $("creatures").appendChild(g); sparkle(x,yOf(d)); }
+
+/* ---------- characters ---------- */
+const FACE={
+ mira:`<svg class="face" viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="34" fill="#E3F6F7"/><circle cx="36" cy="40" r="18" fill="#8d5a3b"/><path d="M16 34 a20 20 0 0 1 40 0 h-40z" fill="#FAA71C"/><rect x="14" y="32" width="44" height="6" rx="3" fill="#D77F28"/><circle cx="36" cy="26" r="4" fill="#fff"/><circle cx="29" cy="42" r="2.6" fill="#151515"/><circle cx="43" cy="42" r="2.6" fill="#151515"/><path d="M30 49 q6 5 12 0" stroke="#151515" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M18 40 q-4 10 2 16 M54 40 q4 10 -2 16" stroke="#2a1a10" stroke-width="5" fill="none" stroke-linecap="round"/></svg>`,
+ echo:`<svg class="face" viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="34" fill="#FFF6E3"/><ellipse cx="36" cy="40" rx="28" ry="17" fill="#00A7B2"/><rect x="30" y="16" width="14" height="12" rx="4" fill="#00928e"/><circle cx="42" cy="40" r="9" fill="#fff" stroke="#FAA71C" stroke-width="3"/><circle cx="44" cy="40" r="4" fill="#151515"/><circle cx="22" cy="40" r="3.5" fill="#fff"/></svg>`,
+ inky:`<svg class="face" viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="34" fill="#FDEEEE"/><ellipse cx="36" cy="30" rx="18" ry="16" fill="#C92426"/><g stroke="#C92426" stroke-width="5" fill="none" stroke-linecap="round"><path d="M22 42 q-6 10 -2 16"/><path d="M30 44 q-2 10 2 16"/><path d="M42 44 q2 10 -2 16"/><path d="M50 42 q6 10 2 16"/></g><circle cx="30" cy="30" r="4" fill="#fff"/><circle cx="42" cy="30" r="4" fill="#fff"/><circle cx="31" cy="31" r="2" fill="#151515"/><circle cx="43" cy="29" r="2" fill="#151515"/><path d="M31 39 q5 -3 10 0" stroke="#fff" stroke-width="2" fill="none"/></svg>`
+};
+const NAME={mira:"Captain Mira",echo:"Echo",inky:"Inky the octopus"};
+const talk=(who,text)=>`<div class="talk ${who}">${FACE[who]}<p class="bubble"><span class="who">${NAME[who]}</span>${text}</p></div>`;
+
+function addStar(n=1){stars+=n;$("starCount").textContent=stars;}
+function setStep(i){ [...$("steps").children].forEach((li,k)=>{li.className=k<i?"done":(k===i?"now":"");}); }
+
+/* ---------- question widgets: drag & drop, match, select-all, fill-in ---------- */
+function fbSet(box,cls,html){ const f=box.querySelector(".feedback"); f.className="feedback "+cls; f.innerHTML=html; }
+function makeDrag(box,bins,items,done){
+  let tries=0, picked=null, finished=false;
+  box.innerHTML=`<p class="hint">Drag a card into a box. Or tap a card, then tap a box.</p><div class="pool">${items.map((it,j)=>`<button class="dc" type="button" draggable="true" data-i="${j}">${it.label}</button>`).join("")}</div>
+   <div class="bins" style="grid-template-columns:repeat(${bins.length},1fr)">${bins.map(b=>`<div class="bin" data-bin="${b.key}"><b class="${b.cls||""}">${b.label}</b><div class="drop"></div></div>`).join("")}</div>
+   <button class="go" type="button" data-role="chk">Check</button><div class="feedback"></div>`;
+  const pool=box.querySelector(".pool"), cards=[...box.querySelectorAll(".dc")], zones=[...box.querySelectorAll(".bin,.pool")];
+  const clearReady=()=>zones.forEach(z=>z.classList.remove("ready"));
+  const place=(c,z)=>{ if(finished)return; (z.classList.contains("pool")?z:z.querySelector(".drop")).appendChild(c); c.classList.remove("picked","bad"); picked=null; clearReady(); tone([440],.06); };
+  cards.forEach(c=>{ c.onclick=(e)=>{ if(finished)return; if(picked&&picked!==c){ e.stopPropagation(); place(picked,c.closest(".bin,.pool")); return; } if(picked===c){c.classList.remove("picked");picked=null;clearReady();return;} cards.forEach(x=>x.classList.remove("picked")); picked=c; c.classList.add("picked"); zones.forEach(z=>z.classList.add("ready")); };
+    c.addEventListener("dragstart",e=>{picked=c;e.dataTransfer.setData("text/plain",c.dataset.i);}); });
+  zones.forEach(z=>{ z.addEventListener("click",e=>{ if(picked&&!e.target.closest(".dc")) place(picked,z); });
+    z.addEventListener("dragover",e=>{e.preventDefault();z.classList.add("over");}); z.addEventListener("dragleave",()=>z.classList.remove("over"));
+    z.addEventListener("drop",e=>{e.preventDefault();z.classList.remove("over");const c=cards[+e.dataTransfer.getData("text/plain")];if(c)place(c,z);}); });
+  box.querySelector('[data-role="chk"]').onclick=()=>{ if(finished)return;
+    if(pool.querySelector(".dc")){ fbSet(box,"oops","Put every card into a box first."); return; }
+    tries++; const bad=cards.filter(c=>c.closest(".bin").dataset.bin!==items[+c.dataset.i].bin);
+    if(!bad.length){ finished=true; cards.forEach(c=>c.classList.add("good")); box.querySelector('[data-role="chk"]').remove(); yay(); done(tries===1); }
+    else { oops(); bad.forEach(c=>{pool.appendChild(c);c.classList.add("bad");}); fbSet(box,"oops",`${cards.length-bad.length} of ${cards.length} are right. The others jumped back to the top. Try again!`); } };
+}
+function makeMatch(box,pairs,done){
+  let tries=0, sel=null, finished=false; const P={}; const COL=["#00A7B2","#FAA71C","#66A34E","#C92426","#D77F28"];
+  const order=shuffle(pairs.map((p,j)=>j));
+  box.innerHTML=`<p class="hint">Tap a card on the left, then its partner on the right.</p><div class="match"><div class="col">${pairs.map((p,j)=>`<button class="mi L" type="button" data-i="${j}">${p[0]}<span class="tagn"></span></button>`).join("")}</div><div class="col">${order.map(j=>`<button class="mi Rt" type="button" data-i="${j}">${pairs[j][1]}<span class="tagn"></span></button>`).join("")}</div></div>
+   <button class="go" type="button" data-role="chk">Check</button><div class="feedback"></div>`;
+  const Ls=[...box.querySelectorAll(".mi.L")], Rs=[...box.querySelectorAll(".mi.Rt")];
+  const paint=()=>{ Ls.concat(Rs).forEach(b=>{b.style.borderColor="";b.querySelector(".tagn").textContent="";b.classList.remove("sel");});
+    Object.entries(P).forEach(([l,r],n)=>{const c=COL[n%COL.length], lb=Ls[+l], rb=Rs.find(x=>+x.dataset.i===r);
+      [lb,rb].forEach(b=>{b.style.borderColor=c;const t=b.querySelector(".tagn");t.textContent=n+1;t.style.background=c;});});
+    if(sel!==null) Ls[sel].classList.add("sel"); };
+  Ls.forEach(b=>b.onclick=()=>{ if(finished)return; const i=+b.dataset.i; delete P[i]; sel=i; paint(); });
+  Rs.forEach(b=>b.onclick=()=>{ if(finished)return; const r=+b.dataset.i;
+    if(sel===null){ const o=Object.keys(P).find(l=>P[l]===r); if(o!==undefined){delete P[o];paint();} return; }
+    Object.keys(P).forEach(l=>{if(P[l]===r)delete P[l];}); P[sel]=r; sel=null; tone([520],.06); paint(); });
+  box.querySelector('[data-role="chk"]').onclick=()=>{ if(finished)return;
+    if(Object.keys(P).length<pairs.length){ fbSet(box,"oops","Match every card on the left first."); return; }
+    tries++; const bad=Object.keys(P).filter(l=>P[l]!==+l);
+    if(!bad.length){ finished=true; box.querySelector('[data-role="chk"]').remove(); yay(); done(tries===1); }
+    else { oops(); bad.forEach(l=>delete P[l]); paint(); fbSet(box,"oops",`${pairs.length-bad.length} of ${pairs.length} pairs are right. The wrong ones were cleared. Try again!`); } };
+}
+function makeMulti(box,options,answers,done){
+  let tries=0, finished=false;
+  box.innerHTML=`<p class="hint">Tick every answer that is true. There is more than one!</p><div class="choices">${options.map(o=>`<button class="choice tick" type="button" aria-pressed="false"><span class="box" aria-hidden="true"></span><span class="t">${o}</span></button>`).join("")}</div>
+   <button class="go" type="button" data-role="chk">Check</button><div class="feedback"></div>`;
+  const opts=[...box.querySelectorAll(".tick")]; const txt=b=>b.querySelector(".t").innerHTML;
+  opts.forEach(b=>b.onclick=()=>{ if(finished)return; b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")!=="true"); b.classList.remove("wrong"); });
+  box.querySelector('[data-role="chk"]').onclick=()=>{ if(finished)return;
+    const chosen=opts.filter(b=>b.getAttribute("aria-pressed")==="true");
+    if(!chosen.length){ fbSet(box,"oops","Tick at least one first."); return; }
+    tries++; const extra=chosen.filter(b=>!answers.includes(txt(b))), missing=answers.filter(a=>!chosen.some(b=>txt(b)===a));
+    if(!extra.length&&!missing.length){ finished=true; chosen.forEach(b=>b.classList.add("right")); opts.forEach(b=>b.disabled=true); box.querySelector('[data-role="chk"]').remove(); yay(); done(tries===1); }
+    else { oops(); extra.forEach(b=>b.classList.add("wrong"));
+      fbSet(box,"oops",extra.length?"One of your ticks is not right (shown in red). Untick it and look again.":`Good so far! There ${missing.length===1?"is 1 more":"are "+missing.length+" more"} to find.`); } };
+}
+function makeType(box,answer,done){
+  let tries=0, finished=false;
+  box.innerHTML=`<div class="typeRow"><button class="pm" type="button" aria-label="Add or remove a minus sign">±</button><input type="text" inputmode="decimal" autocomplete="off" aria-label="Your answer"><span style="font-weight:800">m</span><button class="go" type="button" data-role="chk" style="margin-top:0">Check</button></div><div class="feedback"></div>`;
+  const inp=box.querySelector("input");
+  box.querySelector(".pm").onclick=()=>{ let v=inp.value.trim().replace(/^[+]/,""); inp.value=/^[-\u2212]/.test(v)?v.replace(/^[-\u2212]/,""):MINUS+v; inp.focus(); };
+  const check=()=>{ if(finished)return; const v=parseFloat(inp.value.replace(/[\u2212\u2013]/g,"-").replace(/[^0-9.\-]/g,""));
+    if(isNaN(v)){ fbSet(box,"oops","Type a number first, like 4 or "+MINUS+"4."); return; }
+    tries++;
+    if(v===answer){ finished=true; inp.disabled=true; box.querySelector('[data-role="chk"]').remove(); yay(); done(tries===1); }
+    else { oops(); fbSet(box,"oops",Math.abs(v)===Math.abs(answer)?"So close! Check the sign: is Echo above or below sea level?":"Not yet. Find 0, then count the ticks to Echo."); } };
+  box.querySelector('[data-role="chk"]').onclick=check; inp.addEventListener("keydown",e=>{if(e.key==="Enter")check();}); inp.focus();
+}
+
+/* ---------- intro ---------- */
+const intro=[
+ ["mira","Hi! I’m Captain Mira, ocean explorer. This is Echo, my robot submarine."],
+ ["echo","Beep boop! Oh no… my depth gauge is broken. I can’t tell UP from DOWN!"],
+ ["mira","Let’s fix it together. Sea level is our <b>zero (0)</b>. Above the water, numbers are <b>positive (+)</b>. Below the water, numbers are <b>negative ("+MINUS+")</b>."],
+ ["inky","Hee hee! I’m Inky. I LOVE mixing up plus and minus signs. Try to catch me!"]
+];
+function showIntro(i=0){ setStep(-1);
+  stage.innerHTML=talk(intro[i][0],intro[i][1])+
+   `<button class="go ${i===intro.length-1?'orange':''}" id="nx">${i===intro.length-1?"Start mission 1":"Next"}</button>`;
+  $("nx").onclick=()=> i<intro.length-1?showIntro(i+1):mission1(); $("nx").focus(); }
+
+/* ---------- mission 1: plus, minus or zero ---------- */
+const M1POOL=[
+ ["A seagull flies 5 m above sea level.",1,"Above sea level means positive: +5."],
+ ["You earn 10 coins for finding a shell.",1,"Earning adds coins, so it is positive: +10."],
+ ["The temperature rises by 3 degrees.",1,"Rising goes up, so it is positive: +3."],
+ ["You save $20 in your piggy bank.",1,"Saving money is positive: +20."],
+ ["The lift goes up 2 floors.",1,"Going up is positive: +2."],
+ ["You gain 8 points in a game.",1,"Gaining points is positive: +8."],
+ ["A kite flies 15 m above the ground.",1,"Above is positive: +15."],
+ ["A shark swims 12 m below sea level.",-1,"Below sea level means negative: "+MINUS+"12."],
+ ["You spend 6 coins on a snack.",-1,"Spending takes coins away, so it is negative: "+MINUS+"6."],
+ ["It is 4 degrees below zero outside.",-1,"Below zero is negative: "+MINUS+"4 °C."],
+ ["You lose 3 points in a game.",-1,"Losing points is negative: "+MINUS+"3."],
+ ["The lift goes down to 2 floors below the ground floor.",-1,"Below the ground floor is negative: "+MINUS+"2."],
+ ["You owe your friend $5.",-1,"Owing money is negative: "+MINUS+"5."],
+ ["A diver is 9 m under the water.",-1,"Under the water is negative: "+MINUS+"9."],
+ ["The temperature drops by 5 degrees.",-1,"Dropping goes down, so it is negative: "+MINUS+"5."],
+ ["Echo floats right on the water, at sea level.",0,"Right at sea level is zero: 0."],
+ ["The temperature is exactly 0 °C.",0,"0 °C is zero. Zero is not positive and not negative."],
+ ["Your score did not change at all.",0,"No change means zero: 0."],
+ ["The lift stops at the ground floor.",0,"The ground floor is the zero floor."],
+ ["You have $0. You don’t owe anything either.",0,"Nothing saved and nothing owed is zero."]
+];
+function mission1(){
+  setStep(0);
+  // 5 quick radio messages (2 positive, 2 negative, 1 zero), then a drag-and-drop cargo sort
+  const pos=pick(M1POOL.filter(x=>x[1]===1),2), neg=pick(M1POOL.filter(x=>x[1]===-1),2), zer=pick(M1POOL.filter(x=>x[1]===0),1);
+  const qs=shuffle(pos.concat(neg,zer)); maxStars+=qs.length+2; let i=0;
+  const used=new Set(qs.map(q=>q[0]));
+  stage.innerHTML=talk("mira","<b>Mission 1: Plus or minus?</b> Read each radio message. Is it positive (+), negative ("+MINUS+") or zero (0)? Then sort the cargo cards!")+
+    `<button class="go" id="nx">Let’s go</button>`; $("nx").onclick=ask; $("nx").focus();
+  function ask(){
+    const [text,ans,why]=qs[i];
+    stage.innerHTML=`<p class="counter">Radio message ${i+1} of ${qs.length}</p><p class="q"><span class="tag">📻</span>${text}</p>
+      <div class="choices">
+        <button class="choice plus" data-a="1"><span class="sym">+</span>Positive</button>
+        <button class="choice minus" data-a="-1"><span class="sym">${MINUS}</span>Negative</button>
+        <button class="choice zero" data-a="0"><span class="sym">0</span>Zero</button>
+      </div><div class="feedback" id="fb"></div><div id="after"></div>`;
+    let tries=0;
+    stage.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{
+      const a=+b.dataset.a; tries++;
+      if(a===ans){ b.classList.add("right"); stage.querySelectorAll(".choice").forEach(x=>x.disabled=true); yay();
+        if(tries===1)addStar(); $("fb").className="feedback good"; $("fb").innerHTML=(tries===1?"⭐ Yes! ":"Got it! ")+why;
+        moveEcho(ans===1?2:ans===-1?-2:0,()=>moveEcho(0));
+        $("after").innerHTML=`<button class="go" id="nx">${i<qs.length-1?"Next message":"Finish mission 1"}</button>`;
+        $("nx").onclick=()=>{i++; i<qs.length?ask():sortRound();}; $("nx").focus();
+      } else { b.classList.add("wrong"); b.disabled=true; oops(); $("fb").className="feedback oops";
+        $("fb").innerHTML="Hmm, not quite. Look for clue words: <b>above, up, earn, gain, save</b> are +. <b>Below, down, spend, lose, owe</b> are "+MINUS+". <b>No change</b> or <b>exactly at the start</b> is 0."; }
+    });
+  }
+  function sortRound(){
+    const left=M1POOL.filter(x=>!used.has(x[0]));
+    const items=pick(left.filter(x=>x[1]===1),2).concat(pick(left.filter(x=>x[1]===-1),2),pick(left.filter(x=>x[1]===0),2)).map(x=>({label:x[0],bin:String(x[1])}));
+    stage.innerHTML=talk("echo","Cargo time! These message cards fell out of my hold. <b>Drag each card into the right box</b>: +, "+MINUS+" or 0.")+`<span class="qtype">🖐️ Drag and drop</span><div id="w"></div><div id="after"></div>`;
+    makeDrag($("w"),[{key:"1",label:"+ Positive",cls:"plus"},{key:"-1",label:MINUS+" Negative",cls:"minus"},{key:"0",label:"0 Zero",cls:"zero"}],shuffle(items),first=>{
+      if(first)addStar(2); fbSet($("w"),"good",(first?"⭐⭐ Perfect sort! ":"All sorted! ")+"Up or more is +, down or less is "+MINUS+", no change is 0.");
+      $("after").innerHTML=`<button class="go" id="nx">Finish mission 1</button>`; $("nx").onclick=m1done; $("nx").focus(); });
+  }
+  function m1done(){
+    gaugeFixed=true; $("gauge").classList.remove("broken"); setGauge(echoDepth); yay();
+    stage.innerHTML=talk("echo","Beep! My gauge is working again! Look at the bottom of the screen. Now I can show my depth with + and "+MINUS+".")+
+      `<button class="go orange" id="nx">Start mission 2</button>`; $("nx").onclick=mission2; $("nx").focus();
+  }
+}
+
+/* ---------- mission 2: dive to the spot ---------- */
+function mission2(){
+  setStep(1);
+  const negs=pick([-1,-2,-3,-4,-5,-6,-7,-8,-9,-10],3), poss=pick([2,3,4,5,6,7,8,9,10],2);
+  const targets=shuffle(negs.concat(poss,[0])); maxStars+=targets.length;
+  const negC=shuffle(["fish","puffer","turtle","jelly","crab","chest"]); const posC=shuffle(["gull","drone"]);
+  let i=0, ni=0, pi=0;
+  stage.innerHTML=talk("mira","<b>Mission 2: Dive to the spot.</b> Sea friends are calling Echo. Read where they are, then tap that line on the number line.")+
+    `<button class="go" id="nx">Let’s dive</button>`; $("nx").onclick=ask; $("nx").focus();
+  function msg(d){ const n=Math.abs(d);
+    if(d>0){const c=posC[pi%posC.length]; return [c, c==="gull"?`A seagull is gliding <b>${n} m above</b> sea level. Rise up to say hi!`:`Mira’s camera drone is hovering <b>${n} m above</b> sea level. Go and meet it!`];}
+    if(d<0){const c=negC[ni%negC.length]; const t={fish:`A little fish is waiting <b>${n} m below</b> sea level.`,puffer:`A pufferfish is hiding <b>${n} m below</b> sea level.`,turtle:`A sea turtle is resting <b>${n} m below</b> sea level.`,jelly:`A jellyfish is floating <b>${n} m below</b> sea level.`,crab:`A crab is calling from <b>${n} m below</b> sea level.`,chest:`A treasure chest is stuck <b>${n} m below</b> sea level!`}; return [c,t[c]];}
+    return ["buoy","A red buoy is bobbing <b>exactly at sea level</b>. Go back to it!"];
+  }
+  function ask(){
+    const d=targets[i]; const [type,text]=msg(d); let tries=0;
+    stage.innerHTML=`<p class="counter">Dive ${i+1} of ${targets.length}</p><p class="q"><span class="tag">📍</span>${text}</p>
+     <p class="hint">Tap the line on the number line where Echo should go.</p><div class="feedback" id="fb"></div><div id="after"></div>`;
+    arm(true, function onPick(chosen){
+      tries++; arm(false);
+      moveEcho(chosen,()=>{
+        if(chosen===d){ yay(); if(tries===1)addStar(); if(d>0)pi++; else if(d<0)ni++;
+          placeCreature(type,d); $("fb").className="feedback good";
+          $("fb").innerHTML=(tries===1?"⭐ Perfect dive! ":"You made it! ")+`Echo is at <b>${fmt(d)} m</b>. `+(d>0?"Above sea level is positive.":d<0?"Below sea level is negative.":"Sea level is zero.");
+          $("after").innerHTML=`<button class="go" id="nx">${i<targets.length-1?"Next friend":"Finish mission 2"}</button>`;
+          $("nx").onclick=()=>{i++; i<targets.length?ask():m2done();}; $("nx").focus();
+        } else { oops(); $("fb").className="feedback oops";
+          const dir=d>0?"above":d<0?"below":"at";
+          $("fb").innerHTML=`Echo is at <b>${fmt(chosen)} m</b>. ${chosen>0?"That is above sea level.":chosen<0?"That is below sea level.":"That is sea level."} The friend is ${dir==="at"?"exactly at sea level":`<b>${Math.abs(d)} m ${dir}</b> sea level`}. Count from the 0 line and try again!`;
+          arm(true,onPick); }
+      });
+    });
+  }
+  function m2done(){ maxStars+=2; let r=0;
+    const spots=[pick([-9,-8,-7,-6,-5,-4,-3,-1],1)[0],pick([3,5,7,9],1)[0]];
+    gaugeFixed=false; setGauge(0);
+    stage.innerHTML=talk("inky","Splat! I squirted ink on Echo’s gauge! Now you must <b>read the number line</b> yourself. Hee hee!")+`<button class="go" id="nx">I can do it</button>`;
+    $("nx").onclick=round; $("nx").focus();
+    function round(){
+      const d=spots[r]; stage.innerHTML=`<p class="counter">Ink round ${r+1} of 2</p><p class="q"><span class="tag">✏️</span>Echo is moving… Where is Echo now? Type the number: ____ m</p><span class="qtype">✏️ Fill in the blank</span><div id="w"></div><div id="after"></div>`;
+      moveEcho(d,()=>{ makeType($("w"),d,first=>{ if(first)addStar();
+        fbSet($("w"),"good",(first?"⭐ ":"")+`Yes! Echo is at <b>${fmt(d)} m</b>, ${d>0?"above":"below"} sea level.`);
+        $("after").innerHTML=`<button class="go" id="nx">${r===0?"Next ink round":"Clean the gauge"}</button>`;
+        $("nx").onclick=()=>{ r++; if(r<2) round(); else { gaugeFixed=true; setGauge(echoDepth); finish(); } }; $("nx").focus(); }); });
+    }
+    function finish(){ stage.innerHTML=talk("echo","Wow! Look at all my new friends. Up is +, down is "+MINUS+", and the water line is 0.")+
+     `<button class="go orange" id="nx">Start mission 3</button>`; $("nx").onclick=mission3; $("nx").focus(); }
+  }
+}
+let armHandler=null;
+function arm(on,fn){ const sv=$("scene"); sv.classList.toggle("armed",on);
+  sv.querySelectorAll(".band").forEach(r=>{ r.setAttribute("tabindex",on?"0":"-1"); r.onclick=null; r.onkeydown=null;
+    if(on){ const go=()=>fn(+r.dataset.d); r.onclick=go; r.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go();}}; } }); }
+
+/* ---------- mission 3: what does zero mean (match the columns) ---------- */
+const M3PAIRS=[["Height at sea","Sea level"],["Temperature in °C","Water starts to freeze"],["Mira’s money box","Nothing saved, nothing owed"],["A lift","The ground floor"],["A calendar","Today"],["Game points","No points won or lost"],["Steps on a path","The starting spot"],["Rocket countdown","The moment of launch"]];
+function mission3(){
+  setStep(2); const sets=[]; const all=shuffle(M3PAIRS); sets.push(all.slice(0,4),all.slice(4,8)); maxStars+=4; let i=0;
+  stage.innerHTML=talk("mira","<b>Mission 3: What is zero?</b> Zero is always the <b>starting point</b>. Match each story to what 0 means in it.")+
+   `<button class="go" id="nx">Let’s match</button>`; $("nx").onclick=ask; $("nx").focus();
+  function ask(){
+    stage.innerHTML=`<p class="counter">Match board ${i+1} of 2</p><p class="q"><span class="tag">0</span>What does <b>0</b> mean in each story?</p><span class="qtype">🔗 Match the columns</span><div id="w"></div><div id="after"></div>`;
+    makeMatch($("w"),sets[i],first=>{ if(first)addStar(2);
+      fbSet($("w"),"good",(first?"⭐⭐ All matched first time! ":"All matched! ")+"Each story has its own starting point, and that is its 0.");
+      $("after").innerHTML=`<button class="go" id="nx">${i<1?"Next board":"Finish mission 3"}</button>`;
+      $("nx").onclick=()=>{i++; i<2?ask():m3done();}; $("nx").focus(); });
+  }
+  function m3done(){ stage.innerHTML=talk("inky","Hmph! You’re good at zero. But I’ve scribbled in Echo’s logbook. Can you spot MY mix-ups?")+
+     `<button class="go orange" id="nx">Start mission 4</button>`; $("nx").onclick=mission4; $("nx").focus(); }
+}
+
+/* ---------- mission 4: Inky's mix-ups ---------- */
+const M4POOL=[
+ ["A fish swims 8 m below sea level.",8,-8],
+ ["The temperature is 5 degrees above zero.",5,5],
+ ["You spend $4 on a sticker.",4,-4],
+ ["Echo is floating at sea level.",-1,0],
+ ["You gain 9 points.",9,9],
+ ["A bird flies 6 m above the sea.",-6,6],
+ ["It is 2 degrees below zero.",-2,-2],
+ ["You owe your friend $10.",10,-10],
+ ["The lift goes to 3 floors below the ground floor.",-3,-3],
+ ["The score did not change.",0,0],
+ ["A diver goes 11 m under the water.",11,-11],
+ ["You earn $7 for helping at home.",-7,7]
+];
+function mission4(){
+  setStep(3);
+  const wrongs=pick(M4POOL.filter(x=>x[1]!==x[2]),2), rights=pick(M4POOL.filter(x=>x[1]===x[2]),1);
+  const qs=shuffle(wrongs.concat(rights)); maxStars+=qs.length+wrongs.length+2; let i=0;
+  const used=new Set(qs.map(q=>q[0]));
+  stage.innerHTML=talk("mira","<b>Mission 4: Inky’s mix-ups.</b> Inky wrote a number for each log. Is Inky right, or did he mix up the sign? If he is wrong, fix it!")+
+   `<button class="go" id="nx">Catch Inky</button>`; $("nx").onclick=ask; $("nx").focus();
+  function ask(){
+    const [text,inky,right]=qs[i]; const isRight=inky===right; let tries=0;
+    stage.innerHTML=`<p class="counter">Log ${i+1} of ${qs.length}</p>`+talk("inky",`“${text}” I wrote: <b style="font-size:26px">${fmt(inky)}</b>`)+
+     `<div class="choices"><button class="choice" data-r="1">✅ Inky is right</button><button class="choice" data-r="0">🐙 Inky mixed it up</button></div>
+     <div class="feedback" id="fb"></div><div id="after"></div>`;
+    stage.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{ tries++;
+      const said=b.dataset.r==="1";
+      if(said===isRight){ b.classList.add("right"); stage.querySelectorAll(".choice").forEach(x=>x.disabled=true); yay(); if(tries===1)addStar();
+        if(isRight){ $("fb").className="feedback good"; $("fb").innerHTML=`⭐ Correct! ${fmt(right)} is right this time. Inky got lucky!`; next(); }
+        else { $("fb").className="feedback good"; $("fb").innerHTML=(tries===1?"⭐ ":"")+"You caught Inky! That sign is wrong."; fix(text,inky,right); }
+      } else { b.classList.add("wrong"); b.disabled=true; oops(); $("fb").className="feedback oops";
+        $("fb").innerHTML="Read the clue words again. Is it up or down? More or less? At the start?"; } });
+  }
+  function fix(text,inky,right){
+    const third=right===0?(inky>0?-1:1):(right>0?right+1:right-1);
+    const others=[...new Set([inky,-right,third])].filter(v=>v!==right).slice(0,2);
+    const opts=[right].concat(others);
+    $("after").innerHTML=`<p class="q" style="font-size:19px;margin-top:14px">Now fix it. What should the number be?</p>
+     <div class="choices">${shuffle(opts).map(o=>`<button class="choice fixb" data-v="${o}">${fmt(o)}</button>`).join("")}</div>`;
+    let t2=0;
+    $("after").querySelectorAll(".fixb").forEach(b=>b.onclick=()=>{ t2++;
+      if(+b.dataset.v===right){ b.classList.add("right"); $("after").querySelectorAll(".fixb").forEach(x=>x.disabled=true); yay(); if(t2===1)addStar();
+        $("fb").className="feedback good"; $("fb").innerHTML=`⭐ Fixed! “${text}” is <b>${fmt(right)}</b>. `+(right===0?"Zero is not positive or negative.":right>0?"It goes up or adds, so it is positive.":"It goes down or takes away, so it is negative.");
+        next(true);
+      } else { b.classList.add("wrong"); b.disabled=true; oops(); } });
+  }
+  function next(append){ const holder=document.createElement("div");
+    holder.innerHTML=`<button class="go" id="nx">${i<qs.length-1?"Next log":"Inky’s last page"}</button>`;
+    $("after").appendChild(holder); $("nx").onclick=()=>{i++; i<qs.length?ask():lastPage();}; $("nx").focus(); }
+  function lastPage(){
+    const left=M4POOL.filter(x=>!used.has(x[0]));
+    const w=pick(left.filter(x=>x[1]!==x[2]),R(2,3)), r=pick(left.filter(x=>x[1]===x[2]),5-w.length);
+    const rows=shuffle(w.concat(r)), label=x=>`“${x[0]}” → <b>${fmt(x[1])}</b>`;
+    stage.innerHTML=talk("inky","My last page! Some of these are right… and some are WRONG. <b>Tick ALL the logs I mixed up.</b>")+`<span class="qtype">☑️ Choose all that fit</span><div id="w"></div><div id="after"></div>`;
+    makeMulti($("w"),rows.map(label),w.map(label),first=>{ if(first)addStar(2);
+      fbSet($("w"),"good",(first?"⭐⭐ You caught every mix-up! ":"You caught them all! ")+w.map(x=>`${x[0]} → <b>${fmt(x[2])}</b>`).join("; ")+".");
+      $("after").innerHTML=`<button class="go orange" id="nx">See my treasure</button>`; $("nx").onclick=finale; $("nx").focus(); });
+  }
+}
+
+/* ---------- finale ---------- */
+function finale(){
+  setStep(4); placeCreature("chest",-10); moveEcho(-9);
+  const pct=stars/maxStars, rate=pct>=.9?3:pct>=.7?2:1;
+  stage.innerHTML=`<div class="end">
+    <svg width="150" height="120" viewBox="0 0 150 120" aria-hidden="true">
+      <rect x="25" y="55" width="100" height="55" rx="8" fill="#D77F28"/>
+      <rect x="68" y="62" width="14" height="18" rx="3" fill="#151515"/>
+      <g class="pop"><circle cx="55" cy="48" r="10" fill="#FAA71C"/><circle cx="75" cy="40" r="12" fill="#FAA71C"/><circle cx="96" cy="48" r="10" fill="#FAA71C"/></g>
+      <path d="M22 55 q53 -40 106 0z" fill="#FAA71C" transform="rotate(-18 22 55)"/>
+    </svg>
+    <h2>Gauge fixed! Treasure found!</h2>
+    <div class="rating" aria-label="${rate} out of 3">${"⭐".repeat(rate)}${"☆".repeat(3-rate)}</div>
+    <p>You earned <b>${stars}</b> of <b>${maxStars}</b> stars.</p>
+    <div class="badge"><span class="disp">🏅 Sign Spotter</span><span>You can read +, ${MINUS} and 0 like a real ocean explorer.</span></div>
+    ${talk("echo","Thank you! Remember: <b>up, above, gain</b> is +. <b>Down, below, lose</b> is "+MINUS+". <b>The starting point</b> is 0.")}
+    <button class="go orange" id="again">Play again with new questions</button>
+  </div>`;
+  $("again").onclick=()=>location.reload(); confetti(); yay();
+}
+function confetti(){ if(reduce)return; const cols=["#00A7B2","#FAA71C","#D77F28","#C92426","#66A34E","#42bcb8"];
+  for(let i=0;i<70;i++){const c=document.createElement("div");c.className="confetti";c.style.left=Math.random()*100+"vw";
+   c.style.background=cols[i%cols.length];c.style.animationDelay=Math.random()*1.2+"s";document.body.appendChild(c);setTimeout(()=>c.remove(),4500);} }
+
+showIntro(0);
+})();
+</script>
+</body>
+</html>
